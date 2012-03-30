@@ -1,7 +1,5 @@
 package ddmp.projecttetra;
 
-import java.util.Random;
-
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.EngineOptions.ScreenOrientation;
@@ -19,6 +17,7 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegion
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 
+import android.content.Intent;
 import android.opengl.GLES20;
 import android.view.KeyEvent;
 
@@ -28,16 +27,25 @@ public class MenuActivity extends SimpleBaseGameActivity implements
 	private static final int CAMERA_WIDTH = 480;
 	private static final int CAMERA_HEIGHT = 800;
 
-	protected static final int MENU_RESET = 0;
-	protected static final int MENU_QUIT = MENU_RESET + 1;
+	protected static final int MENU_PLAY = 0;
+	protected static final int MENU_SETTINGS = 1;
+	protected static final int MENU_QUIT = 2;
+	
+	protected static final int SETTINGS_MUTE = 3;
+	protected static final int SETTINGS_BACK = 4;
 
 	private BitmapTextureAtlas mBitmapTextureAtlas;
 
 	protected MenuScene mMenuScene;
+	protected MenuScene mSettingsScene;
 
 	private BitmapTextureAtlas mMenuTexture;
-	protected ITextureRegion mMenuResetTextureRegion;
+	protected ITextureRegion mMenuPlayTextureRegion;
 	protected ITextureRegion mMenuQuitTextureRegion;
+	protected ITextureRegion mMenuSettingsTextureRegion;
+	
+	protected ITextureRegion mSettingsMuteTextureRegion;
+	protected ITextureRegion mSettingsBackTextureRegion;
 
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -57,19 +65,30 @@ public class MenuActivity extends SimpleBaseGameActivity implements
 		this.mBitmapTextureAtlas.load();
 
 		this.mMenuTexture = new BitmapTextureAtlas(this.getTextureManager(),
-				256, 128, TextureOptions.BILINEAR);
-		this.mMenuResetTextureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createFromAsset(this.mMenuTexture, this, "menu_reset.png", 0,
+				200, 750, TextureOptions.BILINEAR);
+		this.mMenuPlayTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createFromAsset(this.mMenuTexture, this, "playButton.png", 0,
 						0);
+		this.mMenuSettingsTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createFromAsset(this.mMenuTexture, this, "settingsButton.png", 0,
+						150);
 		this.mMenuQuitTextureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createFromAsset(this.mMenuTexture, this, "menu_quit.png", 0,
-						50);
+				.createFromAsset(this.mMenuTexture, this, "quitButton.png", 0,
+						300);
+		this.mSettingsMuteTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createFromAsset(this.mMenuTexture, this, "muteButton.png", 0,
+						450);
+		this.mSettingsBackTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createFromAsset(this.mMenuTexture, this, "backButton.png", 0,
+						600);
 		this.mMenuTexture.load();
 	}
 
 	@Override
 	protected Scene onCreateScene() {
 		this.mEngine.registerUpdateHandler(new FPSLogger());
+		
+		this.mSettingsScene = createSettings();
 
 		this.mMenuScene = new MenuScene(this.mCamera);
 		
@@ -78,12 +97,19 @@ public class MenuActivity extends SimpleBaseGameActivity implements
 
 		this.mMenuScene.setBackgroundEnabled(true);
 		
-		final SpriteMenuItem resetMenuItem = new SpriteMenuItem(MENU_RESET,
-				this.mMenuResetTextureRegion,
+		final SpriteMenuItem playMenuItem = new SpriteMenuItem(MENU_PLAY,
+				this.mMenuPlayTextureRegion,
 				this.getVertexBufferObjectManager());
-		resetMenuItem.setBlendFunction(GLES20.GL_SRC_ALPHA,
+		playMenuItem.setBlendFunction(GLES20.GL_SRC_ALPHA,
 				GLES20.GL_ONE_MINUS_SRC_ALPHA);
-		this.mMenuScene.addMenuItem(resetMenuItem);
+		this.mMenuScene.addMenuItem(playMenuItem);
+		
+		final SpriteMenuItem settingsMenuItem = new SpriteMenuItem(MENU_SETTINGS,
+				this.mMenuSettingsTextureRegion,
+				this.getVertexBufferObjectManager());
+		playMenuItem.setBlendFunction(GLES20.GL_SRC_ALPHA,
+				GLES20.GL_ONE_MINUS_SRC_ALPHA);
+		this.mMenuScene.addMenuItem(settingsMenuItem);
 
 		final SpriteMenuItem quitMenuItem = new SpriteMenuItem(MENU_QUIT,
 				this.mMenuQuitTextureRegion,
@@ -93,7 +119,6 @@ public class MenuActivity extends SimpleBaseGameActivity implements
 		this.mMenuScene.addMenuItem(quitMenuItem);
 
 		this.mMenuScene.buildAnimations();
-
 
 		this.mMenuScene.setOnMenuItemClickListener(this);
 
@@ -116,18 +141,52 @@ public class MenuActivity extends SimpleBaseGameActivity implements
 			final IMenuItem pMenuItem, final float pMenuItemLocalX,
 			final float pMenuItemLocalY) {
 		switch (pMenuItem.getID()) {
-		case MENU_RESET:
+		case MENU_PLAY:
+			Intent myIntent = new Intent(MenuActivity.this, TetraActivity.class);
+			MenuActivity.this.startActivity(myIntent);
+			return true;
+		case MENU_SETTINGS:
+			this.mMenuScene.setChildScene(mSettingsScene);
+		case SETTINGS_MUTE:
+			return true;
+		case SETTINGS_BACK:
+			this.mSettingsScene.back();
 			this.mMenuScene.reset();
-			Random random = new Random();
-			this.mMenuScene.setBackground(new Background(random.nextFloat(), random.nextFloat(), random.nextFloat()));
 			return true;
 		case MENU_QUIT:
-			/* End Activity. */
 			this.finish();
 			return true;
 		default:
 			return false;
 		}
+	}
+	
+	protected MenuScene createSettings() {
+		MenuScene settingsScene = new MenuScene(this.mCamera);
+	
+		settingsScene.setBackground(new Background(0.05f, 0.05f, 0.05f));
+
+		settingsScene.setBackgroundEnabled(true);
+		
+		final SpriteMenuItem muteMenuItem = new SpriteMenuItem(SETTINGS_MUTE,
+				this.mSettingsMuteTextureRegion,
+				this.getVertexBufferObjectManager());
+		muteMenuItem.setBlendFunction(GLES20.GL_SRC_ALPHA,
+				GLES20.GL_ONE_MINUS_SRC_ALPHA);
+		settingsScene.addMenuItem(muteMenuItem);
+
+		final SpriteMenuItem backMenuItem = new SpriteMenuItem(SETTINGS_BACK,
+				this.mSettingsBackTextureRegion,
+				this.getVertexBufferObjectManager());
+		backMenuItem.setBlendFunction(GLES20.GL_SRC_ALPHA,
+				GLES20.GL_ONE_MINUS_SRC_ALPHA);
+		settingsScene.addMenuItem(backMenuItem);
+
+		settingsScene.buildAnimations();
+
+		settingsScene.setOnMenuItemClickListener(this);
+		
+		return settingsScene;
 	}
 
 }
