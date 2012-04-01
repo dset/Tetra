@@ -56,7 +56,7 @@ public class PlanetSpawner implements IUpdateHandler {
 								planetSprite, BodyType.DynamicBody, PLANET_FIXTURE_DEF);
 			
 			this.engine.getScene().attachChild(planetSprite);
-			this.physicsWorld.registerPhysicsConnector(new PhysicsConnector(planetSprite, planetBody, true, true));
+			this.physicsWorld.registerPhysicsConnector(new Planet(planetSprite, planetBody));
 		}
 	}
 
