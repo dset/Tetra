@@ -83,10 +83,14 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		/* Create the comet body. */
 		FixtureDef cometFixtureDef = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 		Body cometBody = PhysicsFactory.createCircleBody(this.mPhysicsWorld, cometSprite, BodyType.DynamicBody, cometFixtureDef);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(cometSprite, cometBody, true, true));
+		PhysicsConnector comet = new PhysicsConnector(cometSprite, cometBody, true, true);
+		this.mPhysicsWorld.registerPhysicsConnector(comet);
 		scene.registerUpdateHandler(mPhysicsWorld);
 		
 		this.mCamera.setChaseEntity(cometSprite);
+		
+		PlanetSpawner pSpawner = new PlanetSpawner(this.mEngine, this.mPhysicsWorld, comet, this.mCometTextureRegion);
+		scene.registerUpdateHandler(pSpawner);
 		
 		return scene;
 	}
