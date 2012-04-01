@@ -11,6 +11,9 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.util.FPSLogger;
+import org.andengine.extension.physics.box2d.PhysicsConnector;
+import org.andengine.extension.physics.box2d.PhysicsFactory;
+import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.bitmap.BitmapTexture;
 import org.andengine.opengl.texture.region.ITextureRegion;
@@ -19,14 +22,20 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 import org.andengine.util.debug.Debug;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+
 public class TetraActivity extends SimpleBaseGameActivity {
 	
 	private static final int CAMERA_WIDTH = 720;
 	private static final int CAMERA_HEIGHT = 480;
 	
+	private PhysicsWorld mPhysicsWorld;
+	private Camera mCamera;
 	private ITexture mTexture;
 	private ITextureRegion mCometTextureRegion;
-	private Camera mCamera;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -61,14 +70,23 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		final Scene scene = new Scene();
 		scene.setBackground(new Background(0f, 0f, 0f));
 		
+		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
+		
 		/* Calculate the coordinates for the comet, so its centered on the camera. */
 		final float centerX = (CAMERA_WIDTH - this.mCometTextureRegion.getWidth()) / 2;
 		final float centerY = (CAMERA_HEIGHT - this.mCometTextureRegion.getHeight()) / 2;
 
-		/* Create the comet and add it to the scene. */
-		final Sprite comet = new Sprite(centerX, centerY, this.mCometTextureRegion, this.getVertexBufferObjectManager());
-		scene.attachChild(comet);
-		this.mCamera.setChaseEntity(comet);
+		/* Create the comet sprite and add it to the scene. */
+		final Sprite cometSprite = new Sprite(centerX, centerY, this.mCometTextureRegion, this.getVertexBufferObjectManager());
+		scene.attachChild(cometSprite);
+		
+		/* Create the comet body. */
+		FixtureDef cometFixtureDef = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
+		Body cometBody = PhysicsFactory.createCircleBody(this.mPhysicsWorld, cometSprite, BodyType.DynamicBody, cometFixtureDef);
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(cometSprite, cometBody, true, true));
+		scene.registerUpdateHandler(mPhysicsWorld);
+		
+		this.mCamera.setChaseEntity(cometSprite);
 		
 		return scene;
 	}
