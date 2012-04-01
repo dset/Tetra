@@ -3,7 +3,6 @@ package ddmp.projecttetra;
 import org.andengine.engine.Engine;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.opengl.texture.region.ITextureRegion;
@@ -25,14 +24,14 @@ public class PlanetSpawner implements IUpdateHandler {
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
-	private PhysicsConnector comet;
+	private Comet comet;
 	private ITextureRegion planetTextureRegion;
 	
 	/* Vector that is reused over and over instead of creating a new
 	 * vector every time a spawn point is calculated. */
 	private Vector2 spawnPoint;
 	
-	public PlanetSpawner(Engine engine, PhysicsWorld physicsWorld, PhysicsConnector comet, 
+	public PlanetSpawner(Engine engine, PhysicsWorld physicsWorld, Comet comet, 
 													ITextureRegion planetTextureRegion) {
 		this.engine = engine;
 		this.physicsWorld = physicsWorld;
@@ -56,7 +55,7 @@ public class PlanetSpawner implements IUpdateHandler {
 								planetSprite, BodyType.DynamicBody, PLANET_FIXTURE_DEF);
 			
 			this.engine.getScene().attachChild(planetSprite);
-			this.physicsWorld.registerPhysicsConnector(new Planet(planetSprite, planetBody));
+			this.physicsWorld.registerPhysicsConnector(new Planet(planetSprite, planetBody, comet));
 		}
 	}
 
