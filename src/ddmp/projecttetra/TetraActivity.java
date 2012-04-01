@@ -25,7 +25,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	private static final int CAMERA_HEIGHT = 480;
 	
 	private ITexture mTexture;
-	private ITextureRegion mMeteoroidTextureRegion;
+	private ITextureRegion mCometTextureRegion;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -41,12 +41,12 @@ public class TetraActivity extends SimpleBaseGameActivity {
 			this.mTexture = new BitmapTexture(this.getTextureManager(), new IInputStreamOpener() {
 				@Override
 				public InputStream open() throws IOException {
-					return getAssets().open("gfx/meteoroid.png");
+					return getAssets().open("gfx/comet.png");
 				}
 			});
 
 			this.mTexture.load();
-			this.mMeteoroidTextureRegion = TextureRegionFactory.extractFromTexture(this.mTexture);
+			this.mCometTextureRegion = TextureRegionFactory.extractFromTexture(this.mTexture);
 		} catch (IOException e) {
 			Debug.e(e);
 		}
@@ -59,13 +59,13 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		final Scene scene = new Scene();
 		scene.setBackground(new Background(0f, 0f, 0f));
 		
-		/* Calculate the coordinates for the meteoroid, so its centered on the camera. */
-		final float centerX = (CAMERA_WIDTH - this.mMeteoroidTextureRegion.getWidth()) / 2;
-		final float centerY = (CAMERA_HEIGHT - this.mMeteoroidTextureRegion.getHeight()) / 2;
+		/* Calculate the coordinates for the comet, so its centered on the camera. */
+		final float centerX = (CAMERA_WIDTH - this.mCometTextureRegion.getWidth()) / 2;
+		final float centerY = (CAMERA_HEIGHT - this.mCometTextureRegion.getHeight()) / 2;
 
-		/* Create the meteoroid and add it to the scene. */
-		final Sprite meteoroid = new Sprite(centerX, centerY, this.mMeteoroidTextureRegion, this.getVertexBufferObjectManager());
-		scene.attachChild(meteoroid);
+		/* Create the comet and add it to the scene. */
+		final Sprite comet = new Sprite(centerX, centerY, this.mCometTextureRegion, this.getVertexBufferObjectManager());
+		scene.attachChild(comet);
 		
 		return scene;
 	}
