@@ -18,8 +18,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
  */
 public class PlanetSpawner implements IUpdateHandler {
 	
-	private static final double SPAWN_CHANCE = 0.01;
+	private static final double PLANET_SPAWN_CHANCE = 0.01;
 	private static final FixtureDef PLANET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
+	private static final float PLANET_MIN_SCALE = 2;
+	private static final float PLANET_MAX_SCALE = 5;
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
@@ -41,12 +43,14 @@ public class PlanetSpawner implements IUpdateHandler {
 	
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
-		if(Math.random() < SPAWN_CHANCE) {
+		if(Math.random() < PLANET_SPAWN_CHANCE) {
 			/* Spawn planet */
 			Vector2 spt = getSpawnPoint();
 			
 			Sprite planetSprite = new Sprite(spt.x, spt.y, this.planetTextureRegion, 
 										this.engine.getVertexBufferObjectManager());
+			float scale = (float) (PLANET_MIN_SCALE + Math.random() * (PLANET_MAX_SCALE - PLANET_MIN_SCALE));
+			planetSprite.setScale(scale);
 			
 			Body planetBody = PhysicsFactory.createCircleBody(physicsWorld, 
 								planetSprite, BodyType.DynamicBody, PLANET_FIXTURE_DEF);
@@ -58,7 +62,7 @@ public class PlanetSpawner implements IUpdateHandler {
 
 	@Override
 	public void reset() {
-		
+		// Nothing to do here.
 	}
 	
 	private Vector2 getSpawnPoint() {
