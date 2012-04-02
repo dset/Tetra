@@ -15,6 +15,8 @@ import org.andengine.util.debug.Debug;
  */
 public class PlanetManager implements IUpdateHandler {
 	
+	private static final int MAX_SPAWNED_PLANETS = 8;
+	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
 	private ArrayList<Planet> planets;
@@ -26,8 +28,16 @@ public class PlanetManager implements IUpdateHandler {
 	}
 	
 	public void addPlanet(Planet planet) {
+		if(planets.size() >= MAX_SPAWNED_PLANETS) {
+			return;
+		}
+		
 		planets.add(planet);
 		Debug.d("Number of planets: " + planets.size());
+	}
+	
+	public boolean canSpawn() {
+		return planets.size() < MAX_SPAWNED_PLANETS;
 	}
 	
 	@Override

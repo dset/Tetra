@@ -44,7 +44,7 @@ public class PlanetSpawner implements IUpdateHandler {
 	
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
-		if(Math.random() < PLANET_SPAWN_CHANCE) {
+		if(planetManager.canSpawn() && Math.random() < PLANET_SPAWN_CHANCE) {
 			/* Spawn planet */
 			Vector2 spt = getSpawnPoint();
 			
