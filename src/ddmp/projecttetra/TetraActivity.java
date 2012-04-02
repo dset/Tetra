@@ -88,7 +88,11 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		
 		this.mCamera.setChaseEntity(cometSprite);
 		
-		PlanetSpawner pSpawner = new PlanetSpawner(this.mEngine, this.mPhysicsWorld, comet, this.mCometTextureRegion);
+		PlanetManager pManager = new PlanetManager(this.mEngine, this.mPhysicsWorld);
+		scene.registerUpdateHandler(pManager);
+		
+		PlanetSpawner pSpawner = new PlanetSpawner(this.mEngine, this.mPhysicsWorld, pManager,
+													comet, this.mCometTextureRegion);
 		scene.registerUpdateHandler(pSpawner);
 		
 		return scene;

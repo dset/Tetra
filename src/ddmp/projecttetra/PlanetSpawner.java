@@ -24,6 +24,7 @@ public class PlanetSpawner implements IUpdateHandler {
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
+	private PlanetManager planetManager;
 	private Comet comet;
 	private ITextureRegion planetTextureRegion;
 	
@@ -31,10 +32,11 @@ public class PlanetSpawner implements IUpdateHandler {
 	 * vector every time a spawn point is calculated. */
 	private Vector2 spawnPoint;
 	
-	public PlanetSpawner(Engine engine, PhysicsWorld physicsWorld, Comet comet, 
-													ITextureRegion planetTextureRegion) {
+	public PlanetSpawner(Engine engine, PhysicsWorld physicsWorld, PlanetManager pManager, 
+										Comet comet, ITextureRegion planetTextureRegion) {
 		this.engine = engine;
 		this.physicsWorld = physicsWorld;
+		this.planetManager = pManager;
 		this.comet = comet;
 		this.planetTextureRegion = planetTextureRegion;
 		spawnPoint = new Vector2();
@@ -54,8 +56,11 @@ public class PlanetSpawner implements IUpdateHandler {
 			Body planetBody = PhysicsFactory.createCircleBody(physicsWorld, 
 								planetSprite, BodyType.DynamicBody, PLANET_FIXTURE_DEF);
 			
+			Planet planet = new Planet(planetSprite, planetBody, comet);
+			
 			this.engine.getScene().attachChild(planetSprite);
-			this.physicsWorld.registerPhysicsConnector(new Planet(planetSprite, planetBody, comet));
+			this.physicsWorld.registerPhysicsConnector(planet);
+			this.planetManager.addPlanet(planet);
 		}
 	}
 

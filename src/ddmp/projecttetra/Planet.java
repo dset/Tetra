@@ -20,10 +20,7 @@ public class Planet extends PhysicsConnector {
 		this.comet = comet;
 	}
 	
-	@Override
-	public void onUpdate(float pSecondsElapsed) {
-		super.onUpdate(pSecondsElapsed);
-		
+	public void update() {
 		/* Attract comet by gravity */
 		/* TODO: Very ineffective to create copies of vectors. GC will run often. */
 		float scalar = -GRAVITY_CONSTANT * this.getBody().getMass() * comet.getBody().getMass()
