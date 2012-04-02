@@ -6,6 +6,7 @@ import org.andengine.engine.Engine;
 import org.andengine.engine.Engine.EngineLock;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.util.debug.Debug;
 
 /**
  * Manages all the planets currently spawned in the game. Makes
@@ -26,6 +27,7 @@ public class PlanetManager implements IUpdateHandler {
 	
 	public void addPlanet(Planet planet) {
 		planets.add(planet);
+		Debug.d("Number of planets: " + planets.size());
 	}
 	
 	@Override
