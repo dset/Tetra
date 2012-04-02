@@ -14,10 +14,12 @@ public class Planet extends PhysicsConnector {
 	private static final float GRAVITY_CONSTANT = 0.3f;
 	
 	private Comet comet;
+	private boolean dead;
 
 	public Planet(Sprite planetSprite, Body planetBody, Comet comet) {
 		super(planetSprite, planetBody, true, true);
 		this.comet = comet;
+		this.dead = false;
 	}
 	
 	public void update() {
@@ -27,6 +29,10 @@ public class Planet extends PhysicsConnector {
 						/ comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).len();
 		Vector2 force = comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).nor().mul(scalar);
 		comet.getBody().applyForce(force, comet.getBody().getPosition());
+	}
+	
+	public boolean isDead() {
+		return dead;
 	}
 
 }

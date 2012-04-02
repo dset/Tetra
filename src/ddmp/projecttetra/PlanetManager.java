@@ -3,13 +3,14 @@ package ddmp.projecttetra;
 import java.util.ArrayList;
 
 import org.andengine.engine.Engine;
+import org.andengine.engine.Engine.EngineLock;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 
 /**
  * Manages all the planets currently spawned in the game. Makes
  * sure that the planets update on engine updates and that they
- * are removed when too far away from comet.
+ * are removed when dead.
  */
 public class PlanetManager implements IUpdateHandler {
 	
@@ -32,12 +33,31 @@ public class PlanetManager implements IUpdateHandler {
 		for(Planet planet : planets) {
 			planet.update();
 		}
+		
+		for(int i = planets.size() - 1; i >= 0; i--) {
+			if(planets.get(i).isDead()) {
+				remove(planets.get(i));
+			}
+		}
 	}
 
 	@Override
 	public void reset() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private void remove(Planet planet) {
+		EngineLock engineLock = engine.getEngineLock();
+		engineLock.lock();
+		
+		engine.getScene().detachChild(planet.getShape());
+		planet.getShape().dispose();
+		physicsWorld.unregisterPhysicsConnector(planet);
+		physicsWorld.destroyBody(planet.getBody());
+		
+		engineLock.unlock();
+		planets.remove(planet);
 	}
 
 }
