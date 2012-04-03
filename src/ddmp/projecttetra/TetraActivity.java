@@ -48,7 +48,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 	@Override
 	protected void onCreateResources() {
-		mTextureAtlas = new BuildableBitmapTextureAtlas(this.getTextureManager(), 1024, 1024, TextureOptions.BILINEAR);
+		mTextureAtlas = new BuildableBitmapTextureAtlas(this.getTextureManager(), 1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 			
 		mCometTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTextureAtlas, this, "comet.png");
@@ -77,7 +77,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		final float centerY = (CAMERA_HEIGHT - this.mCometTextureRegion.getHeight()) / 2;
 
 		/* Create the comet sprite and add it to the scene. */
-		final Sprite cometSprite = new Sprite(centerX, centerY, this.mCometTextureRegion, this.getVertexBufferObjectManager());
+		final Sprite cometSprite = new Sprite(centerX, centerY, 0.15f*CAMERA_WIDTH, 0.15f*CAMERA_WIDTH, this.mCometTextureRegion, this.getVertexBufferObjectManager());
 		scene.attachChild(cometSprite);
 		
 		/* Create the comet body. */
