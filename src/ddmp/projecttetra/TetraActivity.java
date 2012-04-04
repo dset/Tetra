@@ -1,8 +1,5 @@
 package ddmp.projecttetra;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.EngineOptions.ScreenOrientation;
@@ -13,12 +10,15 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
-import org.andengine.opengl.texture.ITexture;
-import org.andengine.opengl.texture.bitmap.BitmapTexture;
+import org.andengine.opengl.texture.TextureOptions;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+import org.andengine.opengl.texture.atlas.bitmap.BuildableBitmapTextureAtlas;
+import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
+import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
+import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
-import org.andengine.util.adt.io.in.IInputStreamOpener;
 import org.andengine.util.debug.Debug;
 
 import com.badlogic.gdx.math.Vector2;
@@ -33,8 +33,9 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	
 	private PhysicsWorld mPhysicsWorld;
 	private Camera mCamera;
-	private ITexture mTexture;
+	private BuildableBitmapTextureAtlas mTextureAtlas;
 	private ITextureRegion mCometTextureRegion;
+	private ITextureRegion mPlanetTextureRegion;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -47,19 +48,19 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 	@Override
 	protected void onCreateResources() {
+		mTextureAtlas = new BuildableBitmapTextureAtlas(this.getTextureManager(), 1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
+			
+		mCometTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTextureAtlas, this, "comet.png");
+		mPlanetTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mTextureAtlas, this, "planet_earthlike1.png");
+		
 		try {
-			this.mTexture = new BitmapTexture(this.getTextureManager(), new IInputStreamOpener() {
-				@Override
-				public InputStream open() throws IOException {
-					return getAssets().open("gfx/comet.png");
-				}
-			});
-
-			this.mTexture.load();
-			this.mCometTextureRegion = TextureRegionFactory.extractFromTexture(this.mTexture);
-		} catch (IOException e) {
+			this.mTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 1, 0));
+		} catch (final TextureAtlasBuilderException e) {
 			Debug.e(e);
 		}
+		
+		this.mTextureAtlas.load();
 	}
 
 	@Override
@@ -76,7 +77,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		final float centerY = (CAMERA_HEIGHT - this.mCometTextureRegion.getHeight()) / 2;
 
 		/* Create the comet sprite and add it to the scene. */
-		final Sprite cometSprite = new Sprite(centerX, centerY, this.mCometTextureRegion, this.getVertexBufferObjectManager());
+		final Sprite cometSprite = new Sprite(centerX, centerY, 0.15f*CAMERA_WIDTH, 0.15f*CAMERA_WIDTH, this.mCometTextureRegion, this.getVertexBufferObjectManager());
 		scene.attachChild(cometSprite);
 		
 		/* Create the comet body. */
@@ -92,7 +93,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		scene.registerUpdateHandler(pManager);
 		
 		PlanetSpawner pSpawner = new PlanetSpawner(this.mEngine, this.mPhysicsWorld, pManager,
-													comet, this.mCometTextureRegion);
+													comet, this.mPlanetTextureRegion);
 		scene.registerUpdateHandler(pSpawner);
 		
 		return scene;
