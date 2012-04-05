@@ -77,7 +77,7 @@ public class PlanetSpawner implements IUpdateHandler {
 		
 		float tmpX = (float) (comet.getShape().getX() + Math.cos(angle) * spawnDistance);
 		float tmpY = (float) (comet.getShape().getY() + Math.sin(angle) * spawnDistance);
-		spawnPoint.set(tmpX, tmpY);
+		spawnPoint.set(tmpX+engine.getCamera().getWidth(), tmpY/2);
 		return spawnPoint;
 	}
 
