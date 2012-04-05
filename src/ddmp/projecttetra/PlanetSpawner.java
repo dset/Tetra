@@ -19,8 +19,8 @@ public class PlanetSpawner implements IUpdateHandler {
 	
 	private static final double PLANET_SPAWN_CHANCE = 0.01;
 	private static final FixtureDef PLANET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
-	private static final float PLANET_MIN_SIZE = 0.20f; //In percent of camera width
-	private static final float PLANET_MAX_SIZE = 0.35f;	//In percent of camera width
+	private static final float PLANET_MIN_SIZE = 0.20f; //In percent of camera height
+	private static final float PLANET_MAX_SIZE = 0.35f;	//In percent of camera height
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
@@ -49,7 +49,7 @@ public class PlanetSpawner implements IUpdateHandler {
 			Vector2 spt = getSpawnPoint();
 			
 			float scale = PLANET_MIN_SIZE + (PLANET_MAX_SIZE - PLANET_MIN_SIZE) * (float) Math.random();
-			float size = scale * engine.getCamera().getWidth();
+			float size = scale * engine.getCamera().getHeight();
 			Sprite planetSprite = new Sprite(spt.x, spt.y, size, size,
 									this.planetTextureRegion, this.engine.getVertexBufferObjectManager());
 			
@@ -77,7 +77,7 @@ public class PlanetSpawner implements IUpdateHandler {
 		
 		float tmpX = (float) (comet.getShape().getX() + Math.cos(angle) * spawnDistance);
 		float tmpY = (float) (comet.getShape().getY() + Math.sin(angle) * spawnDistance);
-		spawnPoint.set(tmpX+engine.getCamera().getWidth(), tmpY/2);
+		spawnPoint.set(tmpX/2, tmpY - engine.getCamera().getHeight());
 		return spawnPoint;
 	}
 

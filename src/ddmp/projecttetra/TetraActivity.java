@@ -30,8 +30,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class TetraActivity extends SimpleBaseGameActivity {
 
-	private static final int CAMERA_WIDTH = 720;
-	private static final int CAMERA_HEIGHT = 480;
+	private static final int CAMERA_WIDTH = 480;
+	private static final int CAMERA_HEIGHT = 720;
 
 	private PhysicsWorld mPhysicsWorld;
 	private Camera mCamera;
@@ -44,7 +44,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-		return new EngineOptions(true, ScreenOrientation.LANDSCAPE_SENSOR,
+		return new EngineOptions(true, ScreenOrientation.PORTRAIT_FIXED,
 				new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), mCamera);
 	}
 
@@ -85,7 +85,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 			public boolean onSceneTouchEvent(Scene pScene,
 					TouchEvent pSceneTouchEvent) {
 
-				setYVelocityModifierTouch(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
+				setXVelocityModifierTouch(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 
 				return true;
 			}
@@ -104,7 +104,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 		/* Create the comet sprite and add it to the scene. */
 		final Sprite cometSprite = new Sprite(centerX, centerY,
-				0.12f * CAMERA_WIDTH, 0.12f * CAMERA_WIDTH,
+				0.12f * CAMERA_HEIGHT, 0.12f * CAMERA_HEIGHT,
 				this.mCometTextureRegion, this.getVertexBufferObjectManager());
 		scene.attachChild(cometSprite);
 
@@ -135,16 +135,16 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		return scene;
 	}
 	
-	public float getYVelocityModifier(){
+	public float getXVelocityModifier(){
 		return velocityModifier;
 	}
 	
-	public void setYVelocityModifier(float vMod) {
+	public void setXVelocityModifier(float vMod) {
 		velocityModifier = vMod;
 	}
 	
 	
-	private void setYVelocityModifierTouch(float x, float y){
+	private void setXVelocityModifierTouch(float x, float y){
 		if (x > mCamera.getCenterX()){
 			velocityModifier = velocityModifier + 0.1f;
 		} else {
