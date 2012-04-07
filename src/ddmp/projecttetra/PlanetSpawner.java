@@ -54,7 +54,7 @@ public class PlanetSpawner implements IUpdateHandler {
 									this.planetTextureRegion, this.engine.getVertexBufferObjectManager());
 			
 			Body planetBody = PhysicsFactory.createCircleBody(physicsWorld, 
-								planetSprite, BodyType.DynamicBody, PLANET_FIXTURE_DEF);
+								planetSprite, BodyType.StaticBody, PLANET_FIXTURE_DEF);
 			
 			Planet planet = new Planet(planetSprite, planetBody, comet);
 			
