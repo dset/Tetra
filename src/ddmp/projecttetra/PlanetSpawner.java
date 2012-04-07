@@ -46,10 +46,10 @@ public class PlanetSpawner implements IUpdateHandler {
 	public void onUpdate(float pSecondsElapsed) {
 		if(planetManager.canSpawn() && Math.random() < PLANET_SPAWN_CHANCE) {
 			/* Spawn planet */
-			Vector2 spt = getSpawnPoint();
-			
 			float scale = PLANET_MIN_SIZE + (PLANET_MAX_SIZE - PLANET_MIN_SIZE) * (float) Math.random();
 			float size = scale * engine.getCamera().getHeight();
+			Vector2 spt = getSpawnPoint(size);
+			
 			Sprite planetSprite = new Sprite(spt.x, spt.y, size, size,
 									this.planetTextureRegion, this.engine.getVertexBufferObjectManager());
 			
@@ -69,15 +69,15 @@ public class PlanetSpawner implements IUpdateHandler {
 		// Nothing to do here.
 	}
 	
-	private Vector2 getSpawnPoint() {
+	private Vector2 getSpawnPoint(float size) {
 		double angle = Math.random() * 2 * Math.PI;
 		double spawnDistance = (engine.getCamera().getWidth() / 2) * (engine.getCamera().getWidth() / 2) +
 								(engine.getCamera().getHeight() / 2) * (engine.getCamera().getHeight() / 2);
-		spawnDistance = Math.sqrt(spawnDistance);
+		spawnDistance = Math.sqrt(spawnDistance) + (float) 1/Math.sqrt(2) * size;
 		
-		float tmpX = (float) (comet.getShape().getX() + Math.cos(angle) * spawnDistance);
-		float tmpY = (float) (comet.getShape().getY() + Math.sin(angle) * spawnDistance);
-		spawnPoint.set(tmpX/2, tmpY - engine.getCamera().getHeight());
+		float tmpX = (float) (engine.getCamera().getCenterX() + Math.cos(angle) * spawnDistance) - size/2;
+		float tmpY = (float) (engine.getCamera().getCenterY() + Math.sin(angle) * spawnDistance) - size/2;
+		spawnPoint.set(tmpX, tmpY);
 		return spawnPoint;
 	}
 
