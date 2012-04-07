@@ -70,10 +70,12 @@ public class PlanetSpawner implements IUpdateHandler {
 	}
 	
 	private Vector2 getSpawnPoint(float size) {
-		double angle = Math.random() * 2 * Math.PI;
+		double angle = Math.atan2(comet.getBody().getLinearVelocity().y, comet.getBody().getLinearVelocity().x);
+		angle += Math.PI/4 - Math.random() * Math.PI/2;
 		double spawnDistance = (engine.getCamera().getWidth() / 2) * (engine.getCamera().getWidth() / 2) +
 								(engine.getCamera().getHeight() / 2) * (engine.getCamera().getHeight() / 2);
 		spawnDistance = Math.sqrt(spawnDistance) + (float) 1/Math.sqrt(2) * size;
+		spawnDistance = spawnDistance + Math.random() * 2 * spawnDistance;
 		
 		float tmpX = (float) (engine.getCamera().getCenterX() + Math.cos(angle) * spawnDistance) - size/2;
 		float tmpY = (float) (engine.getCamera().getCenterY() + Math.sin(angle) * spawnDistance) - size/2;

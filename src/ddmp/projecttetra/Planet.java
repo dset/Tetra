@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 public class Planet extends PhysicsConnector {
 	
 	private static final float GRAVITY_CONSTANT = 0.3f;
-	private static final float KILL_DISTANCE_SQUARED = 360000;
+	private static final float KILL_DISTANCE_SQUARED = 2250000;
 	
 	private Comet comet;
 	/* Since comets are static their body has mass 0. But mass is needed to calculate
