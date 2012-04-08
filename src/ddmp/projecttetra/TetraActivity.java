@@ -38,9 +38,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	private BuildableBitmapTextureAtlas mTextureAtlas;
 	private ITextureRegion mCometTextureRegion;
 	private ITextureRegion mPlanetTextureRegion;
+	private Comet comet;
 	
-	private float velocityModifier;
-
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
@@ -84,12 +83,17 @@ public class TetraActivity extends SimpleBaseGameActivity {
 			@Override
 			public boolean onSceneTouchEvent(Scene pScene,
 					TouchEvent pSceneTouchEvent) {
-
-				setXVelocityModifierTouch(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
+				if(pSceneTouchEvent.isActionDown()) {
+					touchDown(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
+				}
+				if(pSceneTouchEvent.isActionUp()) {
+					touchUp(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
+				}
 
 				return true;
 			}
 		});
+		
 
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
 
@@ -113,7 +117,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 				0.5f);
 		Body cometBody = PhysicsFactory.createCircleBody(this.mPhysicsWorld,
 				cometSprite, BodyType.DynamicBody, cometFixtureDef);
-		Comet comet = new Comet(cometSprite, cometBody);
+		cometBody.setLinearVelocity(0, -2);
+		this.comet = new Comet(cometSprite, cometBody);
 		this.mPhysicsWorld.registerPhysicsConnector(comet);
 		scene.registerUpdateHandler(mPhysicsWorld);
 
@@ -126,29 +131,24 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		PlanetSpawner pSpawner = new PlanetSpawner(this.mEngine,
 				this.mPhysicsWorld, pManager, comet, this.mPlanetTextureRegion);
 
-		CometVelocity cVelocity = new CometVelocity(this, cometBody);
-
-		scene.registerUpdateHandler(cVelocity);
-
 		scene.registerUpdateHandler(pSpawner);
 
 		return scene;
 	}
 	
-	public float getXVelocityModifier(){
-		return velocityModifier;
-	}
-	
-	public void setXVelocityModifier(float vMod) {
-		velocityModifier = vMod;
-	}
-	
-	
-	private void setXVelocityModifierTouch(float x, float y){
+	private void touchDown(float x, float y){
 		if (x > mCamera.getCenterX()){
-			velocityModifier = velocityModifier + 0.1f;
+			comet.setTurnRight(true);
 		} else {
-			velocityModifier = velocityModifier - 0.1f;
+			comet.setTurnLeft(true);
+		}
+	}
+	
+	private void touchUp(float x, float y){
+		if (x > mCamera.getCenterX()){
+			comet.setTurnRight(false);
+		} else {
+			comet.setTurnLeft(false);
 		}
 	}
 
