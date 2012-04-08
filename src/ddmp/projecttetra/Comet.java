@@ -14,6 +14,7 @@ public class Comet extends PhysicsConnector {
 	
 	/* Rad / s */
 	private static final float ROTATION_VELOCITY = (float) Math.PI / 2;
+	private static final float STANDARD_VELOCITY = 3f;
 	
 	private Body cometBody;
 	private Vector2 velocity;
@@ -22,7 +23,7 @@ public class Comet extends PhysicsConnector {
 	private boolean turnRight;
 
 	public Comet(Sprite cometSprite, Body cometBody) {
-		super(cometSprite, cometBody, true, true);
+		super(cometSprite, cometBody, true, false);
 		this.cometBody = cometBody;
 		this.velocity = cometBody.getLinearVelocity();
 		
@@ -49,7 +50,13 @@ public class Comet extends PhysicsConnector {
 			cometBody.setLinearVelocity(rotationMatrix[0] * velocity.x + rotationMatrix[2] * velocity.y,
 					rotationMatrix[1] * velocity.x + rotationMatrix[3] * velocity.y);
 		}
+		Vector2 tmpVel = getBody().getLinearVelocity();
+		float angle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180/Math.PI + 90);
+		getShape().setRotation(-angle);
 		
+		if (tmpVel.len() > STANDARD_VELOCITY) {
+			cometBody.setLinearVelocity(tmpVel.mul(0.99f));
+		}
 		
 	}
 	

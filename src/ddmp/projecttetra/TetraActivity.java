@@ -1,6 +1,7 @@
 package ddmp.projecttetra;
 
 import org.andengine.engine.camera.Camera;
+import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -77,12 +78,13 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		final Scene scene = new Scene();
 
 		scene.setBackground(new Background(0f, 0f, 0f));
-
 		scene.setOnSceneTouchListener(new IOnSceneTouchListener() {
 
 			@Override
 			public boolean onSceneTouchEvent(Scene pScene,
 					TouchEvent pSceneTouchEvent) {
+				mCamera.convertSceneToSurfaceTouchEvent(pSceneTouchEvent, 
+											mEngine.getSurfaceWidth(), mEngine.getSurfaceHeight());
 				if(pSceneTouchEvent.isActionDown()) {
 					touchDown(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 				}
@@ -137,7 +139,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	}
 	
 	private void touchDown(float x, float y){
-		if (x > mCamera.getCenterX()){
+		if (x > mEngine.getSurfaceWidth()/2){
 			comet.setTurnRight(true);
 		} else {
 			comet.setTurnLeft(true);
@@ -145,11 +147,18 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	}
 	
 	private void touchUp(float x, float y){
-		if (x > mCamera.getCenterX()){
+		if (x > mEngine.getSurfaceWidth()/2){
 			comet.setTurnRight(false);
 		} else {
 			comet.setTurnLeft(false);
 		}
+		updateCameraRotation();
+	}
+	
+	private void updateCameraRotation() {
+		Vector2 tmpVel = comet.getBody().getLinearVelocity();
+		float angle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180/Math.PI + 90);
+		mCamera.setRotation(angle);
 	}
 
 }
