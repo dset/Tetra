@@ -32,10 +32,15 @@ public class Planet extends PhysicsConnector {
 		/* Attract comet by gravity */
 		/* TODO: Very ineffective to create copies of vectors. GC will run often. 
 		 * Should be rewritten so that it doesn't create any objects. */
-		float scalar = -GRAVITY_CONSTANT * this.mass * comet.getBody().getMass()
-						/ comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).len();
-		Vector2 force = comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).nor().mul(scalar);
-		comet.getBody().applyForce(force, comet.getBody().getPosition());
+		Vector2 planetDir = getBody().getPosition().cpy().sub(comet.getBody().getPosition());
+		Vector2 velTmp = comet.getBody().getLinearVelocity();
+		double angle = Math.acos(planetDir.dot(velTmp) / (planetDir.len() * velTmp.len()));
+		if(Math.abs(angle) < Math.PI/2) {
+			float scalar = -GRAVITY_CONSTANT * this.mass * comet.getBody().getMass()
+							/ comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).len();
+			Vector2 force = comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).nor().mul(scalar);
+			comet.getBody().applyForce(force, comet.getBody().getPosition());
+		}
 		
 		/* Die if far away from comet */
 		float distanceX = getShape().getX() - comet.getShape().getX();
