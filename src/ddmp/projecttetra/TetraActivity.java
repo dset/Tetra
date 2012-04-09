@@ -42,6 +42,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	private BuildableBitmapTextureAtlas mTextureAtlas;
 	private ITextureRegion mCometTextureRegion;
 	private ITextureRegion mPlanetTextureRegion;
+	private ITextureRegion mStarTextureRegion;
 	private Comet comet;
 	private boolean cameraUpdates = true;
 
@@ -63,6 +64,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 				.createFromAsset(mTextureAtlas, this, "comet.png");
 		mPlanetTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "planet_earthlike1.png");
+		mStarTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createFromAsset(mTextureAtlas, this, "star.png");
 
 		try {
 			this.mTextureAtlas
@@ -168,7 +171,9 @@ public class TetraActivity extends SimpleBaseGameActivity {
 			public void reset() {}
 
 		});
-
+		
+		scene.attachChild(new StarBackground(mStarTextureRegion, comet, mCamera), 0);
+		
 		return scene;
 	}
 
