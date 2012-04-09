@@ -103,19 +103,17 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
 
+		/* Create the comet sprite and add it to the scene. */
+		final Sprite cometSprite = new Sprite(0, 0,
+				0.12f * CAMERA_HEIGHT, 0.12f * CAMERA_HEIGHT,
+				this.mCometTextureRegion, this.getVertexBufferObjectManager());
 		/*
 		 * Calculate the coordinates for the comet, so its centered on the
 		 * camera.
 		 */
-		final float centerX = (CAMERA_WIDTH - this.mCometTextureRegion
-				.getWidth()) / 2;
-		final float centerY = (CAMERA_HEIGHT - this.mCometTextureRegion
-				.getHeight()) / 2;
-
-		/* Create the comet sprite and add it to the scene. */
-		final Sprite cometSprite = new Sprite(centerX, centerY,
-				0.12f * CAMERA_HEIGHT, 0.12f * CAMERA_HEIGHT,
-				this.mCometTextureRegion, this.getVertexBufferObjectManager());
+		final float centerX = (CAMERA_WIDTH - cometSprite.getWidth()) / 2;
+		final float centerY = (CAMERA_HEIGHT - cometSprite.getHeight()) / 2;
+		cometSprite.setPosition(centerX, centerY);
 		scene.attachChild(cometSprite);
 
 		/* Create the comet body. */
