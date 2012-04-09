@@ -55,7 +55,7 @@ public class Comet extends PhysicsConnector {
 		getShape().setRotation(-angle);
 		
 		if (tmpVel.len() > STANDARD_VELOCITY) {
-			cometBody.setLinearVelocity(tmpVel.mul(0.99f));
+//			cometBody.setLinearVelocity(tmpVel.mul(0.99f));
 		}
 		
 	}

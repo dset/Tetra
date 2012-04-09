@@ -24,6 +24,8 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.debug.Debug;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -33,6 +35,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 	private static final int CAMERA_WIDTH = 480;
 	private static final int CAMERA_HEIGHT = 720;
+	private float CAMERA_SLOWNESS = 15;
 
 	private PhysicsWorld mPhysicsWorld;
 	private Camera mCamera;
@@ -40,7 +43,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	private ITextureRegion mCometTextureRegion;
 	private ITextureRegion mPlanetTextureRegion;
 	private Comet comet;
-	
+	private boolean cameraUpdates = true;
+
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
@@ -62,8 +66,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 		try {
 			this.mTextureAtlas
-					.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(
-							0, 1, 0));
+			.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(
+					0, 1, 0));
 		} catch (final TextureAtlasBuilderException e) {
 			Debug.e(e);
 		}
@@ -84,7 +88,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 			public boolean onSceneTouchEvent(Scene pScene,
 					TouchEvent pSceneTouchEvent) {
 				mCamera.convertSceneToSurfaceTouchEvent(pSceneTouchEvent, 
-											mEngine.getSurfaceWidth(), mEngine.getSurfaceHeight());
+						mEngine.getSurfaceWidth(), mEngine.getSurfaceHeight());
 				if(pSceneTouchEvent.isActionDown()) {
 					touchDown(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 				}
@@ -95,7 +99,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 				return true;
 			}
 		});
-		
+
 
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
 
@@ -135,30 +139,57 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 		scene.registerUpdateHandler(pSpawner);
 
+		scene.registerUpdateHandler(new IUpdateHandler() {
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+				if(cameraUpdates) {
+					Vector2 tmpVel = comet.getBody().getLinearVelocity();
+					float goalAngle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180/Math.PI + 90);
+					float camAngle = mCamera.getRotation();
+					Log.d("Angles", "Cam: " + camAngle + " Goal: " + goalAngle);
+					if (camAngle<=-180 && goalAngle>=0) {
+						float newAngle = (CAMERA_SLOWNESS*camAngle+(goalAngle-360))/(CAMERA_SLOWNESS+1);
+						if (newAngle < -270) { // keep angles between -270 and 90
+							newAngle += 360;
+						}
+						mCamera.setRotation(newAngle);
+					} else if (camAngle>=0 && goalAngle<=-180) {
+						float newAngle = (CAMERA_SLOWNESS*camAngle+(goalAngle+360))/(CAMERA_SLOWNESS+1);
+						if (newAngle > 90) {
+							newAngle -= 360;
+						}
+						mCamera.setRotation(newAngle);
+					} else {
+						mCamera.setRotation((float) (CAMERA_SLOWNESS*camAngle+goalAngle)/(CAMERA_SLOWNESS+1));
+					}
+				}
+			}
+
+			@Override
+			public void reset() {}
+
+		});
+
 		return scene;
 	}
-	
-	private void touchDown(float x, float y){
-		if (x > mEngine.getSurfaceWidth()/2){
+
+	private void touchDown(float x, float y) {
+		cameraUpdates = false;
+		if (x > mEngine.getSurfaceWidth() / 2) {
 			comet.setTurnRight(true);
 		} else {
 			comet.setTurnLeft(true);
 		}
 	}
-	
-	private void touchUp(float x, float y){
-		if (x > mEngine.getSurfaceWidth()/2){
+
+	private void touchUp(float x, float y) {
+		cameraUpdates = true;
+		if (x > mEngine.getSurfaceWidth() / 2) {
 			comet.setTurnRight(false);
 		} else {
 			comet.setTurnLeft(false);
 		}
-		updateCameraRotation();
-	}
-	
-	private void updateCameraRotation() {
-		Vector2 tmpVel = comet.getBody().getLinearVelocity();
-		float angle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180/Math.PI + 90);
-		mCamera.setRotation(angle);
 	}
 
 }

@@ -17,7 +17,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
  */
 public class PlanetSpawner implements IUpdateHandler {
 	
-	private static final double PLANET_SPAWN_CHANCE = 0.01;
+	private static double spawnChance = 0.005;
 	private static final FixtureDef PLANET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 	private static final float PLANET_MIN_SIZE = 0.20f; //In percent of camera height
 	private static final float PLANET_MAX_SIZE = 0.35f;	//In percent of camera height
@@ -44,7 +44,8 @@ public class PlanetSpawner implements IUpdateHandler {
 	
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
-		if(planetManager.canSpawn() && Math.random() < PLANET_SPAWN_CHANCE) {
+		if(planetManager.canSpawn() && Math.random() < spawnChance) {
+			spawnChance = 0.005;
 			/* Spawn planet */
 			float scale = PLANET_MIN_SIZE + (PLANET_MAX_SIZE - PLANET_MIN_SIZE) * (float) Math.random();
 			float size = scale * engine.getCamera().getHeight();
@@ -61,6 +62,8 @@ public class PlanetSpawner implements IUpdateHandler {
 			this.engine.getScene().attachChild(planetSprite);
 			this.physicsWorld.registerPhysicsConnector(planet);
 			this.planetManager.addPlanet(planet);
+		} else {
+			spawnChance += 0.05*pSecondsElapsed;
 		}
 	}
 
