@@ -1,7 +1,7 @@
 package ddmp.projecttetra;
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.Entity;
@@ -14,57 +14,27 @@ public class StarBackground extends Entity {
 	private static final int NUM_GENERATED_STARS = 40;
 	/* The number of max simultaneously visible stars. */
 	private static final int NUM_ACTIVE_STARS = 20;
+	/* The stars speed relative comet. */
+	private static final float RELATIVE_SPEED = 0.9f;
 	
-	/* In percent of camera height. */
-	private static final float STAR_MIN_SIZE = 0.005f;
-	/* In percent of camera height. */
-	private static final float STAR_MAX_SIZE = 0.01f;
-	
-	private ITextureRegion starTextureRegion;
 	private Comet comet;
 	private Camera camera;
-	private Sprite[] starPool;
-	private HashSet<Sprite> activeStars;
+	private LinkedList<Star> activeStars;
+	private StarPool starPool;
 	
 	public StarBackground(ITextureRegion starTextureRegion, Comet comet, Camera camera) {
-		this.starTextureRegion = starTextureRegion;
 		this.comet = comet;
 		this.camera = camera;
+		this.activeStars = new LinkedList<Star>();
+		this.starPool = new StarPool(starTextureRegion, camera, comet.getShape().getVertexBufferObjectManager());
+		this.starPool.generateStars(NUM_GENERATED_STARS, this);
 		setChildrenIgnoreUpdate(true);
-		starPool = new Sprite[NUM_GENERATED_STARS];
-		activeStars = new HashSet<Sprite>();
-		generateStars();
 		spawnInitialStars();
 	}
 	
-	private void generateStars() {
-		float size;
-		for(int i = 0; i < starPool.length; i++) {
-			size = (STAR_MIN_SIZE + (float) Math.random() * (STAR_MAX_SIZE - STAR_MIN_SIZE)) * camera.getHeight();
-			starPool[i] = new Sprite(0, 0, size, size, starTextureRegion, comet.getShape().getVertexBufferObjectManager());
-			starPool[i].setAlpha((float) Math.random());
-			starPool[i].setVisible(false);
-			attachChild(starPool[i]);
-		}
-	}
-	
 	private void spawnInitialStars() {
-		float topLeftCornerX = camera.getXMin();
-		float topLeftCornerY = camera.getYMin();
-		float cameraWidth = camera.getWidth();
-		float cameraHeight = camera.getHeight();
-		int randomIndex;
-		float x, y;
 		for(int i = 0; i < NUM_ACTIVE_STARS; i++) {
-			randomIndex = (int) (starPool.length * Math.random());
-			if(activeStars.contains(starPool[randomIndex])) {
-				continue;
-			}
-			x = topLeftCornerX + (float) Math.random() * cameraWidth;
-			y = topLeftCornerY + (float) Math.random() * cameraHeight;
-			starPool[randomIndex].setPosition(x, y);
-			starPool[randomIndex].setVisible(true);
-			activeStars.add(starPool[randomIndex]);
+			spawnStarInsideView();
 		}
 	}
 	
@@ -72,53 +42,58 @@ public class StarBackground extends Entity {
 	public void onManagedUpdate(float pSecondsElapsed) {
 		super.onManagedUpdate(pSecondsElapsed);
 		
-		float leftLimit = camera.getCenterX() - camera.getWidth();
-		float rightLimit = camera.getCenterX() + camera.getWidth();
-		float topLimit = camera.getCenterY() - camera.getHeight();
-		float bottomLimit = camera.getCenterY() + camera.getHeight();
-		
-		Iterator<Sprite> starIterator = activeStars.iterator();
+		recycleDeadStars();
+		if(activeStars.size() < NUM_ACTIVE_STARS) {
+			spawnStarOutsideView();
+		}
+		updatePosition(pSecondsElapsed);
+	}
+	
+	private void recycleDeadStars() {
+		Iterator<Star> starIterator = activeStars.iterator();
 		while(starIterator.hasNext()) {
-			Sprite star = starIterator.next();
-			float[] coords = this.convertLocalToSceneCoordinates(star.getX(), star.getY());
-			float tmpX = coords[Sprite.VERTEX_INDEX_X];
-			float tmpY = coords[Sprite.VERTEX_INDEX_Y];
-			if( tmpX < leftLimit || tmpX > rightLimit 
-				|| tmpY < topLimit || tmpY > bottomLimit ) {
+			Star star = starIterator.next();
+			if(star.isDead()) {
 				star.setVisible(false);
+				starPool.recycleStar(star);
 				starIterator.remove();
 			}
 		}
-		
-		if(activeStars.size() < NUM_ACTIVE_STARS) {
-			spawnStar();
-		}
-		
-		float vX = comet.getBody().getLinearVelocity().x * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT;
-		float vY = comet.getBody().getLinearVelocity().y * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT;
-		this.setPosition(this.getX() + vX * pSecondsElapsed * 0.80f, this.getY() + vY * pSecondsElapsed * 0.80f);
 	}
 	
-	private void spawnStar() {
-		float spawnDistance = (camera.getWidth() / 2) * (camera.getWidth() / 2) +
-								(camera.getHeight() / 2) * (camera.getHeight() / 2);
-		spawnDistance = (float) Math.sqrt(spawnDistance);
-		
+	private void updatePosition(float pSecondsElapsed) {
+		float vX = comet.getBody().getLinearVelocity().x * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT * RELATIVE_SPEED;
+		float vY = comet.getBody().getLinearVelocity().y * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT * RELATIVE_SPEED;
+		this.setPosition(this.getX() + vX * pSecondsElapsed, this.getY() + vY * pSecondsElapsed);
+	}
+	
+	private void spawnStarInsideView() {
+		float spawnDistance = getSpawnDistance() * (float) Math.random();
+		double angle = 2 * Math.PI * Math.random();
+		spawnStar(spawnDistance, (float) angle);
+	}
+	
+	private void spawnStarOutsideView() {
+		float spawnDistance = getSpawnDistance();
 		double angle = Math.atan2(comet.getBody().getLinearVelocity().y, comet.getBody().getLinearVelocity().x);
 		angle += Math.PI/4 - Math.random() * Math.PI/2;
+		spawnStar(spawnDistance, (float) angle);
+	}
+	
+	private void spawnStar(float distance, float angle) {
+		float sceneX = camera.getCenterX() + distance * (float) Math.cos(angle);
+		float sceneY = camera.getCenterY() + distance * (float) Math.sin(angle);
+		float localCoords[] = this.convertSceneToLocalCoordinates(sceneX, sceneY);
 		
-		float x = (float) (camera.getCenterX() + Math.cos(angle) * spawnDistance);
-		float y = (float) (camera.getCenterY() + Math.sin(angle) * spawnDistance);
-		
-		float coords[] = this.convertSceneToLocalCoordinates(x, y);
-		
-		int randomIndex = (int) (starPool.length * Math.random());
-		if(activeStars.contains(starPool[randomIndex])) {
-			return;
-		}
-		starPool[randomIndex].setPosition(coords[Sprite.VERTEX_INDEX_X], coords[Sprite.VERTEX_INDEX_Y]);
-		starPool[randomIndex].setVisible(true);
-		activeStars.add(starPool[randomIndex]);
+		Star star = starPool.getStar();
+		star.setPosition(localCoords[Sprite.VERTEX_INDEX_X], localCoords[Sprite.VERTEX_INDEX_Y]);
+		star.setVisible(true);
+		activeStars.add(star);
+	}
+	
+	private float getSpawnDistance() {
+		return (float) Math.sqrt((camera.getWidth() / 2) * (camera.getWidth() / 2) + 
+				(camera.getHeight() / 2) * (camera.getHeight() / 2));
 	}
 	
 }
