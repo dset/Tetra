@@ -24,8 +24,6 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.debug.Debug;
 
-import android.util.Log;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -35,7 +33,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 	private static final int CAMERA_WIDTH = 480;
 	private static final int CAMERA_HEIGHT = 720;
-	private float CAMERA_SLOWNESS = 15;
+	private static final float CAMERA_SLOWNESS_FAST = 25;
+	private static final float CAMERA_SLOWNESS_SLOW = 50;
 
 	private PhysicsWorld mPhysicsWorld;
 	private Camera mCamera;
@@ -145,25 +144,9 @@ public class TetraActivity extends SimpleBaseGameActivity {
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
 				if(cameraUpdates) {
-					Vector2 tmpVel = comet.getBody().getLinearVelocity();
-					float goalAngle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180/Math.PI + 90);
-					float camAngle = mCamera.getRotation();
-					Log.d("Angles", "Cam: " + camAngle + " Goal: " + goalAngle);
-					if (camAngle<=-180 && goalAngle>=0) {
-						float newAngle = (CAMERA_SLOWNESS*camAngle+(goalAngle-360))/(CAMERA_SLOWNESS+1);
-						if (newAngle < -270) { // keep angles between -270 and 90
-							newAngle += 360;
-						}
-						mCamera.setRotation(newAngle);
-					} else if (camAngle>=0 && goalAngle<=-180) {
-						float newAngle = (CAMERA_SLOWNESS*camAngle+(goalAngle+360))/(CAMERA_SLOWNESS+1);
-						if (newAngle > 90) {
-							newAngle -= 360;
-						}
-						mCamera.setRotation(newAngle);
-					} else {
-						mCamera.setRotation((float) (CAMERA_SLOWNESS*camAngle+goalAngle)/(CAMERA_SLOWNESS+1));
-					}
+					updateCamera(CAMERA_SLOWNESS_FAST);
+				} else {
+					updateCamera(CAMERA_SLOWNESS_SLOW);
 				}
 			}
 
@@ -175,6 +158,27 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		scene.attachChild(new StarBackground(mStarTextureRegion, comet, mCamera), 0);
 		
 		return scene;
+	}
+	
+	private void updateCamera(float slowness) {
+		Vector2 tmpVel = comet.getBody().getLinearVelocity();
+		float goalAngle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180/Math.PI + 90);
+		float camAngle = mCamera.getRotation();
+		if (camAngle<=-180 && goalAngle>=0) {
+			float newAngle = (slowness*camAngle+(goalAngle-360))/(slowness+1);
+			if (newAngle < -270) { // keep angles between -270 and 90
+				newAngle += 360;
+			}
+			mCamera.setRotation(newAngle);
+		} else if (camAngle>=0 && goalAngle<=-180) {
+			float newAngle = (slowness*camAngle+(goalAngle+360))/(slowness+1);
+			if (newAngle > 90) {
+				newAngle -= 360;
+			}
+			mCamera.setRotation(newAngle);
+		} else {
+			mCamera.setRotation((float) (slowness*camAngle+goalAngle)/(slowness+1));
+		}
 	}
 
 	private void touchDown(float x, float y) {
