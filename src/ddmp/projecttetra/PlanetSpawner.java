@@ -7,26 +7,30 @@ import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 /**
  * Spawns planets in the vicinity of the comet.
  */
 public class PlanetSpawner implements IUpdateHandler {
 	
-	private static double spawnChance = 0.005;
 	private static final FixtureDef PLANET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
-	private static final float PLANET_MIN_SIZE = 0.20f; //In percent of camera height
-	private static final float PLANET_MAX_SIZE = 0.35f;	//In percent of camera height
+	private static final float PLANET_MIN_SIZE = 0.15f; //In percent of camera height
+	private static final float PLANET_MAX_SIZE = 0.25f;	//In percent of camera height
+	private static final float MIN_SPAWN_TIME = 0.5f;
+	private static final float MAX_SPAWN_TIME = 1.0f;
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
 	private PlanetManager planetManager;
 	private Comet comet;
 	private ITextureRegion planetTextureRegion;
+	private float timeSinceSpawn;
 	
 	/* Vector that is reused over and over instead of creating a new
 	 * vector every time a spawn point is calculated. */
@@ -40,31 +44,42 @@ public class PlanetSpawner implements IUpdateHandler {
 		this.comet = comet;
 		this.planetTextureRegion = planetTextureRegion;
 		spawnPoint = new Vector2();
+		timeSinceSpawn = getSpawnTime();
 	}
 	
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
-		if(planetManager.canSpawn() && Math.random() < spawnChance) {
-			spawnChance = 0.005;
+		if (timeSinceSpawn <= 0.0f && planetManager.canSpawn()) {
 			/* Spawn planet */
 			float scale = PLANET_MIN_SIZE + (PLANET_MAX_SIZE - PLANET_MIN_SIZE) * (float) Math.random();
 			float size = scale * engine.getCamera().getHeight();
 			Vector2 spt = getSpawnPoint(size);
+			Log.d("NEW POTENTIAL PLANET", "" + spt);
 			
-			Sprite planetSprite = new Sprite(spt.x, spt.y, size, size,
+			/* Check so it is not too close to another planet. */
+			if(!planetManager.isGravitated(spt)) {
+				Log.d("NEW PLANET", "" + spt);
+
+				Sprite planetSprite = new Sprite(spt.x, spt.y, size, size,
 									this.planetTextureRegion, this.engine.getVertexBufferObjectManager());
 			
-			Body planetBody = PhysicsFactory.createCircleBody(physicsWorld, 
+				Body planetBody = PhysicsFactory.createCircleBody(physicsWorld, 
 								planetSprite, BodyType.StaticBody, PLANET_FIXTURE_DEF);
 			
-			Planet planet = new Planet(planetSprite, planetBody, comet);
+				Planet planet = new Planet(planetSprite, planetBody, comet, engine);
 			
-			this.engine.getScene().attachChild(planetSprite);
-			this.physicsWorld.registerPhysicsConnector(planet);
-			this.planetManager.addPlanet(planet);
+				this.engine.getScene().attachChild(planetSprite);
+				this.physicsWorld.registerPhysicsConnector(planet);
+				this.planetManager.addPlanet(planet);
+				timeSinceSpawn = getSpawnTime();
+			}
 		} else {
-			spawnChance += 0.05*pSecondsElapsed;
+			timeSinceSpawn -= pSecondsElapsed;
 		}
+	}
+
+	private float getSpawnTime() {
+		return MIN_SPAWN_TIME + (float) Math.random() * (MAX_SPAWN_TIME - MIN_SPAWN_TIME);
 	}
 
 	@Override

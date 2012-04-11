@@ -8,6 +8,8 @@ import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.util.debug.Debug;
 
+import com.badlogic.gdx.math.Vector2;
+
 /**
  * Manages all the planets currently spawned in the game. Makes
  * sure that the planets update on engine updates and that they
@@ -70,6 +72,15 @@ public class PlanetManager implements IUpdateHandler {
 		
 		engineLock.unlock();
 		planets.remove(planet);
+	}
+
+	public boolean isGravitated(Vector2 point) {
+		for(Planet planet : planets) {
+			if (planet.isGravitating(point)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

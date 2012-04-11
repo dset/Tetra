@@ -33,8 +33,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 	private static final int CAMERA_WIDTH = 480;
 	private static final int CAMERA_HEIGHT = 720;
-	private static final float CAMERA_SLOWNESS_FAST = 25;
-	private static final float CAMERA_SLOWNESS_SLOW = 50;
+	private static final float CAMERA_SLOWNESS_FAST = 20;
+	private static final float CAMERA_SLOWNESS_SLOW = 55;
 
 	private PhysicsWorld mPhysicsWorld;
 	private Camera mCamera;
@@ -123,7 +123,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 				0.5f);
 		Body cometBody = PhysicsFactory.createCircleBody(this.mPhysicsWorld,
 				cometSprite, BodyType.DynamicBody, cometFixtureDef);
-		cometBody.setLinearVelocity(0, -2);
+		cometBody.setLinearVelocity(0, -7);
 		this.comet = new Comet(cometSprite, cometBody);
 		this.mPhysicsWorld.registerPhysicsConnector(comet);
 		scene.registerUpdateHandler(mPhysicsWorld);
