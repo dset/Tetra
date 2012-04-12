@@ -15,7 +15,7 @@ import com.badlogic.gdx.physics.box2d.Body;
  */
 public class Planet extends PhysicsConnector {
 	
-	private static final float GRAVITY_CONSTANT = 1f;
+	private static final float GRAVITY_CONSTANT = 1.2f;
 	private static final float KILL_DISTANCE_SQUARED = 2250000;
 	/* Relative planet radius. */
 	private static final float GRAVITY_FIELD_DISTANCE = 3.0f;
@@ -40,7 +40,9 @@ public class Planet extends PhysicsConnector {
 		/* TODO: Very ineffective to create copies of vectors. GC will run often. 
 		 * Should be rewritten so that it doesn't create any objects. */
 		Vector2 velTmp = comet.getBody().getLinearVelocity();
-		if(isGravitating(comet.getBody().getPosition())) {
+		float cometCenterX = comet.getShape().getX() + comet.getShape().getScaleCenterX();
+		float cometCenterY = comet.getShape().getY() + comet.getShape().getScaleCenterY();
+		if(isGravitating(new Vector2().set(cometCenterX, cometCenterY))) {
 			float scalar = GRAVITY_CONSTANT * this.mass * comet.getBody().getMass()
 							/ comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).len();
 			Vector2 force = velTmp.cpy().nor().mul(scalar);
@@ -48,8 +50,8 @@ public class Planet extends PhysicsConnector {
 			Log.d("APPLIED FORCE", "" + scalar + ", " + force + ", " + velTmp);
 		}
 		
-		float distanceX = getShape().getX() + getShape().getScaleCenterX() - comet.getBody().getPosition().x;
-		float distanceY = getShape().getY() + getShape().getScaleCenterY() - comet.getBody().getPosition().y;
+		float distanceX = getShape().getX() + getShape().getScaleCenterX() - cometCenterX;
+		float distanceY = getShape().getY() + getShape().getScaleCenterY() - cometCenterY;
 		float distanceSq = distanceX * distanceX + distanceY * distanceY;
 		/* Die if far away from comet */
 		if(distanceSq > KILL_DISTANCE_SQUARED) {

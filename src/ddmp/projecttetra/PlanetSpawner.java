@@ -23,7 +23,7 @@ public class PlanetSpawner implements IUpdateHandler {
 	private static final float PLANET_MIN_SIZE = 0.15f; //In percent of camera height
 	private static final float PLANET_MAX_SIZE = 0.25f;	//In percent of camera height
 	private static final float MIN_SPAWN_TIME = 0.5f;
-	private static final float MAX_SPAWN_TIME = 1.0f;
+	private static final float MAX_SPAWN_TIME = 0.8f;
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;

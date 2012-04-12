@@ -1,6 +1,7 @@
 package ddmp.projecttetra;
 
 
+import org.andengine.engine.camera.Camera;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 
@@ -14,17 +15,19 @@ public class Comet extends PhysicsConnector {
 	
 	/* Rad / s */
 	private static final float ROTATION_VELOCITY = (float) Math.PI / 2;
-	private static final float FRICTION_COEFFICIENT = 0.00001f;
+	private static final float FRICTION_COEFFICIENT = 2f;
 	
 	private Body cometBody;
 	private Vector2 velocity;
 	private float[] rotationMatrix;
 	private boolean turnLeft;
 	private boolean turnRight;
+	private Camera mCamera;
 
-	public Comet(Sprite cometSprite, Body cometBody) {
+	public Comet(Sprite cometSprite, Body cometBody, Camera mCamera) {
 		super(cometSprite, cometBody, true, false);
 		this.cometBody = cometBody;
+		this.mCamera = mCamera;
 		this.velocity = cometBody.getLinearVelocity();
 		
 		rotationMatrix = new float[4];
@@ -55,6 +58,8 @@ public class Comet extends PhysicsConnector {
 		getShape().setRotation(-angle);
 		
 		cometBody.applyForce(velocity.cpy().nor().mul(-FRICTION_COEFFICIENT * pSecondsElapsed * velocity.len2()), cometBody.getPosition());
+		mCamera.setCenter(getShape().getX() + getShape().getScaleCenterX(), getShape().getY() + getShape().getScaleCenterY());
+		
 	}
 	
 	public void setTurnLeft(boolean val) {
