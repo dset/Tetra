@@ -13,6 +13,7 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
+import org.andengine.entity.util.FPSCounter;
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
@@ -55,6 +56,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	private Comet comet;
 	private Font mFont;
 	private HUD mHud;
+	private FPSCounter fpsCounter;
 	private boolean cameraUpdates = true;
 
 	@Override
@@ -104,18 +106,45 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 		scene.setBackground(new Background(0f, 0f, 0f));
 		
-		final Text scoreText = new Text(100, 160, this.mFont, "Score:",
+		fpsCounter = new FPSCounter();
+		mEngine.registerUpdateHandler(fpsCounter);
+		
+		final Text fpsText = new Text(50, 700, this.mFont, "FPS:",
+				"FPS: XXXXXXXXXXX".length(),
+				this.getVertexBufferObjectManager());
+		final Text scoreText = new Text(300, 700, this.mFont, "Score:",
 				"Score: XXXXXXXX".length(),
 				this.getVertexBufferObjectManager());
+		final Text blackHoleText = new Text(0, 0, this.mFont, "Black Hole",
+				"Black Hole".length(),
+				this.getVertexBufferObjectManager());
 		mHud = new HUD();
+		mHud.attachChild(fpsText);
 		mHud.attachChild(scoreText);
+		mHud.attachChild(blackHoleText);
 		mCamera.setHUD(mHud);
-		mHud.registerUpdateHandler(new TimerHandler(1 / 20.0f, true,
-				new ITimerCallback() {
+		mHud.registerUpdateHandler(new IUpdateHandler() {
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+				scoreText.setText("Score: "
+						+ (int) (-comet.getShape().getY()));				
+//				Vector2 tmpVector = new Vector2((float)Math.cos((mCamera.getRotation()+90)*Math.PI/180), (float)Math.sin((mCamera.getRotation()+90)*Math.PI/180)).mul(200f);
+				Vector2 tmpVector = comet.getBody().getLinearVelocity().cpy().nor().mul(200f);
+				blackHoleText.setPosition(CAMERA_WIDTH/2+tmpVector.x-40, CAMERA_HEIGHT/2-tmpVector.y);
+			}
+
+			@Override
+			public void reset() {}
+			
+		});
+
+		mHud.registerUpdateHandler(new TimerHandler(0.5f, true, new ITimerCallback() {
+
 			@Override
 			public void onTimePassed(final TimerHandler pTimerHandler) {
-				scoreText.setText("Score: "
-						+ (int) (-comet.getShape().getY()));
+				fpsText.setText("FPS: " + (int)fpsCounter.getFPS());
+				fpsCounter.reset();
 			}
 
 		}));
@@ -126,8 +155,6 @@ public class TetraActivity extends SimpleBaseGameActivity {
 			public boolean onSceneTouchEvent(Scene pScene,
 					TouchEvent pSceneTouchEvent) {
 				Log.d("Touch", "" + pSceneTouchEvent.getX() + ", " + pSceneTouchEvent.getY());
-//				mCamera.convertSceneToSurfaceTouchEvent(pSceneTouchEvent,
-//						mEngine.getSurfaceWidth(), mEngine.getSurfaceHeight());
 				if (pSceneTouchEvent.isActionDown()) {
 					touchDown(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 				}

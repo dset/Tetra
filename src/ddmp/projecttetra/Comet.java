@@ -15,7 +15,7 @@ public class Comet extends PhysicsConnector {
 	
 	/* Rad / s */
 	private static final float ROTATION_VELOCITY = (float) Math.PI / 2;
-	private static final float FRICTION_COEFFICIENT = 2f;
+	private static final float FRICTION_COEFFICIENT = 5f;
 	
 	private Body cometBody;
 	private Vector2 velocity;

@@ -15,7 +15,7 @@ import com.badlogic.gdx.physics.box2d.Body;
  */
 public class Planet extends PhysicsConnector {
 	
-	private static final float GRAVITY_CONSTANT = 1.2f;
+	private static final float GRAVITY_CONSTANT = 3.5f;
 	private static final float KILL_DISTANCE_SQUARED = 2250000;
 	/* Relative planet radius. */
 	private static final float GRAVITY_FIELD_DISTANCE = 3.0f;
