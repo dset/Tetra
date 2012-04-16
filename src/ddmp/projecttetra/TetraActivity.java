@@ -2,17 +2,12 @@ package ddmp.projecttetra;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
-import org.andengine.engine.handler.IUpdateHandler;
-import org.andengine.engine.handler.timer.ITimerCallback;
-import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.text.Text;
-import org.andengine.entity.util.FPSCounter;
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
@@ -52,7 +47,6 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	private Comet comet;
 	private Font mFont;
 	private HUD mHud;
-	private FPSCounter fpsCounter;
 
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -100,49 +94,6 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		final Scene scene = new Scene();
 
 		scene.setBackground(new Background(0f, 0f, 0f));
-		
-		fpsCounter = new FPSCounter();
-		mEngine.registerUpdateHandler(fpsCounter);
-		
-		final Text fpsText = new Text(50, 700, this.mFont, "FPS:",
-				"FPS: XXXXXXXXXXX".length(),
-				this.getVertexBufferObjectManager());
-		final Text scoreText = new Text(300, 700, this.mFont, "Score:",
-				"Score: XXXXXXXX".length(),
-				this.getVertexBufferObjectManager());
-		final Text blackHoleText = new Text(0, 0, this.mFont, "Black Hole",
-				"Black Hole".length(),
-				this.getVertexBufferObjectManager());
-		mHud = new HUD();
-		mHud.attachChild(fpsText);
-		mHud.attachChild(scoreText);
-		mHud.attachChild(blackHoleText);
-		mCamera.setHUD(mHud);
-		mHud.registerUpdateHandler(new IUpdateHandler() {
-
-			@Override
-			public void onUpdate(float pSecondsElapsed) {
-				scoreText.setText("Score: "
-						+ (int) (-comet.getShape().getY()));				
-//				Vector2 tmpVector = new Vector2((float)Math.cos((mCamera.getRotation()+90)*Math.PI/180), (float)Math.sin((mCamera.getRotation()+90)*Math.PI/180)).mul(200f);
-				Vector2 tmpVector = comet.getBody().getLinearVelocity().cpy().nor().mul(200f);
-				blackHoleText.setPosition(CAMERA_WIDTH/2+tmpVector.x-40, CAMERA_HEIGHT/2-tmpVector.y);
-			}
-
-			@Override
-			public void reset() {}
-			
-		});
-
-		mHud.registerUpdateHandler(new TimerHandler(0.5f, true, new ITimerCallback() {
-
-			@Override
-			public void onTimePassed(final TimerHandler pTimerHandler) {
-				fpsText.setText("FPS: " + (int)fpsCounter.getFPS());
-				fpsCounter.reset();
-			}
-
-		}));
 
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
 
@@ -177,7 +128,9 @@ public class TetraActivity extends SimpleBaseGameActivity {
 				this.mPhysicsWorld, pManager, comet, this.mPlanetTextureRegion);
 
 		scene.registerUpdateHandler(pSpawner);
-
+		
+		mHud = new TetraHUD(this.mFont, this.getVertexBufferObjectManager(), this.comet);
+		mCamera.setHUD(mHud);
 
 		this.cameraRotator = new CameraRotator(comet, mCamera);
 		scene.registerUpdateHandler(cameraRotator);
