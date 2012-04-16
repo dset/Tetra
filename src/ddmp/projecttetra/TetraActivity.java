@@ -44,11 +44,10 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 	private static final int CAMERA_WIDTH = 480;
 	private static final int CAMERA_HEIGHT = 720;
-	private static final float CAMERA_SLOWNESS_FAST = 20;
-	private static final float CAMERA_SLOWNESS_SLOW = 55;
 
 	private PhysicsWorld mPhysicsWorld;
 	private Camera mCamera;
+	private CameraRotator cameraRotator;
 	private BuildableBitmapTextureAtlas mTextureAtlas;
 	private ITextureRegion mCometTextureRegion;
 	private ITextureRegion mPlanetTextureRegion;
@@ -57,7 +56,6 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	private Font mFont;
 	private HUD mHud;
 	private FPSCounter fpsCounter;
-	private boolean cameraUpdates = true;
 
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -201,23 +199,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		scene.registerUpdateHandler(pSpawner);
 
 
-
-		scene.registerUpdateHandler(new IUpdateHandler() {
-
-			@Override
-			public void onUpdate(float pSecondsElapsed) {
-				if (cameraUpdates) {
-					updateCamera(CAMERA_SLOWNESS_FAST);
-				} else {
-					updateCamera(CAMERA_SLOWNESS_SLOW);
-				}
-			}
-
-			@Override
-			public void reset() {
-			}
-
-		});
+		this.cameraRotator = new CameraRotator(comet, mCamera);
+		scene.registerUpdateHandler(cameraRotator);
 
 		scene.attachChild(
 				new StarBackground(mStarTextureRegion, comet, mCamera), 0);
@@ -225,33 +208,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		return scene;
 	}
 
-	private void updateCamera(float slowness) {
-		Vector2 tmpVel = comet.getBody().getLinearVelocity();
-		float goalAngle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180
-				/ Math.PI + 90);
-		float camAngle = mCamera.getRotation();
-		if (camAngle <= -180 && goalAngle >= 0) {
-			float newAngle = (slowness * camAngle + (goalAngle - 360))
-					/ (slowness + 1);
-			if (newAngle < -270) { // keep angles between -270 and 90
-				newAngle += 360;
-			}
-			mCamera.setRotation(newAngle);
-		} else if (camAngle >= 0 && goalAngle <= -180) {
-			float newAngle = (slowness * camAngle + (goalAngle + 360))
-					/ (slowness + 1);
-			if (newAngle > 90) {
-				newAngle -= 360;
-			}
-			mCamera.setRotation(newAngle);
-		} else {
-			mCamera.setRotation((float) (slowness * camAngle + goalAngle)
-					/ (slowness + 1));
-		}
-	}
-
 	private void touchDown(float x, float y) {
-		cameraUpdates = false;
+		cameraRotator.setCameraUpdates(false);
 		if (x > CAMERA_WIDTH / 2) {
 			comet.setTurnRight(true);
 		} else {
@@ -260,7 +218,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	}
 
 	private void touchUp(float x, float y) {
-		cameraUpdates = true;
+		cameraRotator.setCameraUpdates(true);
 		if (x > CAMERA_WIDTH / 2) {
 			comet.setTurnRight(false);
 		} else {
