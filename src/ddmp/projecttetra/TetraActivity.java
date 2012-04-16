@@ -8,7 +8,6 @@ import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
-import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
@@ -17,7 +16,6 @@ import org.andengine.entity.util.FPSCounter;
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
-import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.TextureOptions;
@@ -33,7 +31,6 @@ import org.andengine.util.debug.Debug;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -146,23 +143,6 @@ public class TetraActivity extends SimpleBaseGameActivity {
 			}
 
 		}));
-		
-		mHud.setOnSceneTouchListener(new IOnSceneTouchListener() {
-
-			@Override
-			public boolean onSceneTouchEvent(Scene pScene,
-					TouchEvent pSceneTouchEvent) {
-				Log.d("Touch", "" + pSceneTouchEvent.getX() + ", " + pSceneTouchEvent.getY());
-				if (pSceneTouchEvent.isActionDown()) {
-					touchDown(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
-				}
-				if (pSceneTouchEvent.isActionUp()) {
-					touchUp(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
-				}
-
-				return true;
-			}
-		});
 
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
 
@@ -201,29 +181,14 @@ public class TetraActivity extends SimpleBaseGameActivity {
 
 		this.cameraRotator = new CameraRotator(comet, mCamera);
 		scene.registerUpdateHandler(cameraRotator);
+		
+		mHud.setOnSceneTouchListener(
+				new TetraTouchHandler(mCamera, cameraRotator, comet));
 
 		scene.attachChild(
 				new StarBackground(mStarTextureRegion, comet, mCamera), 0);
 
 		return scene;
-	}
-
-	private void touchDown(float x, float y) {
-		cameraRotator.setCameraUpdates(false);
-		if (x > CAMERA_WIDTH / 2) {
-			comet.setTurnRight(true);
-		} else {
-			comet.setTurnLeft(true);
-		}
-	}
-
-	private void touchUp(float x, float y) {
-		cameraRotator.setCameraUpdates(true);
-		if (x > CAMERA_WIDTH / 2) {
-			comet.setTurnRight(false);
-		} else {
-			comet.setTurnLeft(false);
-		}
 	}
 
 }
