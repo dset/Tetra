@@ -1,7 +1,6 @@
 package ddmp.projecttetra;
 
 import org.andengine.engine.camera.Camera;
-import org.andengine.engine.camera.hud.HUD;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -37,17 +36,16 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	private static final int CAMERA_WIDTH = 480;
 	private static final int CAMERA_HEIGHT = 720;
 
-	private PhysicsWorld mPhysicsWorld;
-	private Camera mCamera;
-	private CameraRotator cameraRotator;
 	private BuildableBitmapTextureAtlas mTextureAtlas;
 	private ITextureRegion mCometTextureRegion;
 	private ITextureRegion mPlanetTextureRegion;
 	private ITextureRegion mStarTextureRegion;
-	private Comet comet;
 	private Font mFont;
-	private HUD mHud;
-
+	private Scene scene;
+	private Camera mCamera;
+	private PhysicsWorld mPhysicsWorld;
+	private Comet comet;
+	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
@@ -91,57 +89,63 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	protected Scene onCreateScene() {
 		this.mEngine.registerUpdateHandler(new FPSLogger());
 
-		final Scene scene = new Scene();
-
-		scene.setBackground(new Background(0f, 0f, 0f));
+		this.scene = new Scene();
 
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
+		scene.registerUpdateHandler(mPhysicsWorld);
+		
+		createComet();
+		createPlanets();
+		createBackground();
 
-		/* Create the comet sprite and add it to the scene. */
-		final Sprite cometSprite = new Sprite(0, 0, 0.10f * CAMERA_HEIGHT,
+		CameraRotator cameraRotator = new CameraRotator(comet, mCamera);
+		scene.registerUpdateHandler(cameraRotator);
+		
+		createHUD(cameraRotator);
+
+		return scene;
+	}
+	
+	private void createComet() {
+		Sprite cometSprite = new Sprite(0, 0, 0.10f * CAMERA_HEIGHT,
 				0.10f * CAMERA_HEIGHT, this.mCometTextureRegion,
 				this.getVertexBufferObjectManager());
 		/*
 		 * Calculate the coordinates for the comet, so its centered on the
 		 * camera.
 		 */
-		final float centerX = (CAMERA_WIDTH - cometSprite.getWidth()) / 2;
-		final float centerY = (CAMERA_HEIGHT - cometSprite.getHeight()) / 2;
+		float centerX = (CAMERA_WIDTH - cometSprite.getWidth()) / 2;
+		float centerY = (CAMERA_HEIGHT - cometSprite.getHeight()) / 2;
 		cometSprite.setPosition(centerX, centerY);
 		scene.attachChild(cometSprite);
 
 		/* Create the comet body. */
-		FixtureDef cometFixtureDef = PhysicsFactory.createFixtureDef(1, 0.5f,
-				0.5f);
+		FixtureDef cometFixtureDef = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 		Body cometBody = PhysicsFactory.createCircleBody(this.mPhysicsWorld,
 				cometSprite, BodyType.DynamicBody, cometFixtureDef);
 		cometBody.setLinearVelocity(0, -7);
+		
 		this.comet = new Comet(cometSprite, cometBody, mCamera);
 		this.mPhysicsWorld.registerPhysicsConnector(comet);
-		scene.registerUpdateHandler(mPhysicsWorld);
-		
-		PlanetManager pManager = new PlanetManager(this.mEngine,
-				this.mPhysicsWorld);
+	}
+	
+	private void createPlanets() {
+		PlanetManager pManager = new PlanetManager(this.mEngine, this.mPhysicsWorld);
+		PlanetSpawner pSpawner = new PlanetSpawner(this.mEngine, this.mPhysicsWorld, pManager, 
+										comet, this.mPlanetTextureRegion);
 		scene.registerUpdateHandler(pManager);
-
-		PlanetSpawner pSpawner = new PlanetSpawner(this.mEngine,
-				this.mPhysicsWorld, pManager, comet, this.mPlanetTextureRegion);
-
 		scene.registerUpdateHandler(pSpawner);
-		
-		mHud = new TetraHUD(this.mFont, this.getVertexBufferObjectManager(), this.comet);
-		mCamera.setHUD(mHud);
-
-		this.cameraRotator = new CameraRotator(comet, mCamera);
-		scene.registerUpdateHandler(cameraRotator);
-		
-		mHud.setOnSceneTouchListener(
-				new TetraTouchHandler(mCamera, cameraRotator, comet));
-
-		scene.attachChild(
-				new StarBackground(mStarTextureRegion, comet, mCamera), 0);
-
-		return scene;
+	}
+	
+	private void createBackground() {
+		scene.setBackground(new Background(0f, 0f, 0f));
+		scene.attachChild( new StarBackground(mStarTextureRegion, comet, mCamera), 0);
+	}
+	
+	private void createHUD(CameraRotator cameraRotator) {
+		TetraHUD hud = new TetraHUD(this.mFont, this.getVertexBufferObjectManager(), this.comet);
+		hud.setOnSceneTouchListener(new TetraTouchHandler(mCamera, cameraRotator, comet));
+		mCamera.setHUD(hud);
 	}
 
 }
