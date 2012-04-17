@@ -5,8 +5,6 @@ import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.input.touch.TouchEvent;
 
-import android.util.Log;
-
 /**
  * Handles the touch events in the game.
  */
@@ -24,7 +22,6 @@ public class TetraTouchHandler implements IOnSceneTouchListener {
 	
 	@Override
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
-		Log.d("Touch", "" + pSceneTouchEvent.getX() + ", " + pSceneTouchEvent.getY());
 		if (pSceneTouchEvent.isActionDown()) {
 			touchDown(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 		}

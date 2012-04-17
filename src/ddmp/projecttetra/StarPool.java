@@ -6,7 +6,6 @@ import org.andengine.engine.camera.Camera;
 import org.andengine.entity.Entity;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.andengine.util.debug.Debug;
 
 /**
  * A pool of stars. Used to recycle the same star objects instead
@@ -38,13 +37,11 @@ public class StarPool {
 	 * Returns a random star from the pool.
 	 */
 	public Star getStar() {
-		Debug.d("GET STAR!");
 		int randomIndex = (int) (Math.random() * pool.size());
 		return pool.remove(randomIndex);
 	}
 	
 	public void recycleStar(Star star) {
-		Debug.d("recycle star!");
 		pool.add(star);
 	}
 	

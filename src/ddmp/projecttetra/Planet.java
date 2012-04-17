@@ -5,8 +5,6 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 
-import android.util.Log;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
@@ -47,7 +45,6 @@ public class Planet extends PhysicsConnector {
 							/ comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).len();
 			Vector2 force = velTmp.cpy().nor().mul(scalar);
 			comet.getBody().applyForce(force, comet.getBody().getPosition());
-			Log.d("APPLIED FORCE", "" + scalar + ", " + force + ", " + velTmp);
 		}
 		
 		float distanceX = getShape().getX() + getShape().getScaleCenterX() - cometCenterX;
