@@ -16,7 +16,7 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class PlanetManager implements IUpdateHandler {
 	
-	private static final int MAX_SPAWNED_PLANETS = 8;
+	private static final int MAX_SPAWNED_PLANETS = 20;
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
@@ -39,6 +39,8 @@ public class PlanetManager implements IUpdateHandler {
 	public boolean canSpawn() {
 		return planets.size() < MAX_SPAWNED_PLANETS;
 	}
+	
+	
 	
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
@@ -71,6 +73,10 @@ public class PlanetManager implements IUpdateHandler {
 		
 		engineLock.unlock();
 		planets.remove(planet);
+	}
+	
+	public ArrayList<Planet> getPlanets(){
+		return planets;
 	}
 
 	public boolean isGravitated(Vector2 point) {

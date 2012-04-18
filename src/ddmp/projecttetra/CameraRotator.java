@@ -1,6 +1,6 @@
 package ddmp.projecttetra;
 
-import org.andengine.engine.camera.Camera;
+import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.handler.IUpdateHandler;
 
 import com.badlogic.gdx.math.Vector2;
@@ -15,10 +15,10 @@ public class CameraRotator implements IUpdateHandler {
 	private static final float CAMERA_SLOWNESS_SLOW = 55;
 	
 	private Comet comet;
-	private Camera camera;
+	private ZoomCamera camera;
 	private boolean cameraUpdates;
 	
-	public CameraRotator(Comet comet, Camera camera) {
+	public CameraRotator(Comet comet, ZoomCamera camera) {
 		this.comet = comet;
 		this.camera = camera;
 		cameraUpdates = true;
@@ -69,6 +69,8 @@ public class CameraRotator implements IUpdateHandler {
 			camera.setRotation((float) (slowness * camAngle + goalAngle)
 					/ (slowness + 1));
 		}
+		float zoomFactor = 2.0f/(float)Math.pow(comet.getBody().getLinearVelocity().len(),0.5f);
+		camera.setZoomFactor((zoomFactor<1.0f)? zoomFactor : 1.0f);
 	}
 
 }

@@ -50,7 +50,7 @@ public class PlanetSpawner implements IUpdateHandler {
 		if (timeSinceSpawn <= 0.0f && planetManager.canSpawn()) {
 			/* Spawn planet */
 			float scale = PLANET_MIN_SIZE + (PLANET_MAX_SIZE - PLANET_MIN_SIZE) * (float) Math.random();
-			float size = scale * engine.getCamera().getHeight();
+			float size = scale * TetraActivity.CAMERA_HEIGHT;
 			Vector2 spt = getSpawnPoint(size);
 			
 			/* Check so it is not too close to another planet. */

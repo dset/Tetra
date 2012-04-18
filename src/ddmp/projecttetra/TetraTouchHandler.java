@@ -10,12 +10,10 @@ import org.andengine.input.touch.TouchEvent;
  */
 public class TetraTouchHandler implements IOnSceneTouchListener {
 	
-	private Camera camera;
 	private CameraRotator cameraRotator;
 	private Comet comet;
 	
 	public TetraTouchHandler(Camera camera, CameraRotator cameraRotator, Comet comet) {
-		this.camera = camera;
 		this.cameraRotator = cameraRotator;
 		this.comet = comet;
 	}
@@ -28,13 +26,12 @@ public class TetraTouchHandler implements IOnSceneTouchListener {
 		if (pSceneTouchEvent.isActionUp()) {
 			touchUp(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 		}
-
 		return true;
 	}
 	
 	private void touchDown(float x, float y) {
 		cameraRotator.setCameraUpdates(false);
-		if (x > camera.getWidth() / 2) {
+		if (x > TetraActivity.CAMERA_WIDTH / 2) {
 			comet.setTurnRight(true);
 		} else {
 			comet.setTurnLeft(true);
@@ -43,7 +40,7 @@ public class TetraTouchHandler implements IOnSceneTouchListener {
 
 	private void touchUp(float x, float y) {
 		cameraRotator.setCameraUpdates(true);
-		if (x > camera.getWidth() / 2) {
+		if (x > TetraActivity.CAMERA_WIDTH / 2) {
 			comet.setTurnRight(false);
 		} else {
 			comet.setTurnLeft(false);

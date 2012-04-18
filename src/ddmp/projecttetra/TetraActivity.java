@@ -1,6 +1,6 @@
 package ddmp.projecttetra;
 
-import org.andengine.engine.camera.Camera;
+import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -33,22 +33,26 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class TetraActivity extends SimpleBaseGameActivity {
 
-	private static final int CAMERA_WIDTH = 480;
-	private static final int CAMERA_HEIGHT = 720;
+	public static final int CAMERA_WIDTH = 480;
+	public static final int CAMERA_HEIGHT = 720;
 
 	private BuildableBitmapTextureAtlas mTextureAtlas;
 	private ITextureRegion mCometTextureRegion;
 	private ITextureRegion mPlanetTextureRegion;
 	private ITextureRegion mStarTextureRegion;
+	private ITextureRegion mHoleArrowTextureRegion;
+	private ITextureRegion mPlanetArrowTextureRegion;
+	private PlanetManager pManager;
+	private PlanetSpawner pSpawner;
 	private Font mFont;
 	private Scene scene;
-	private Camera mCamera;
+	private ZoomCamera mCamera;
 	private PhysicsWorld mPhysicsWorld;
 	private Comet comet;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
-		this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+		this.mCamera = new ZoomCamera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 		return new EngineOptions(true, ScreenOrientation.PORTRAIT_FIXED,
 				new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), mCamera);
 	}
@@ -66,7 +70,12 @@ public class TetraActivity extends SimpleBaseGameActivity {
 				.createFromAsset(mTextureAtlas, this, "planet_earthlike1.png");
 		mStarTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "star.png");
-
+		
+		mHoleArrowTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createFromAsset(mTextureAtlas, this, "holearrow.png");
+		mPlanetArrowTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createFromAsset(mTextureAtlas, this, "planetarrow.png");
+		
 		try {
 			this.mTextureAtlas
 			.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(
@@ -130,8 +139,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	}
 	
 	private void createPlanets() {
-		PlanetManager pManager = new PlanetManager(this.mEngine, this.mPhysicsWorld);
-		PlanetSpawner pSpawner = new PlanetSpawner(this.mEngine, this.mPhysicsWorld, pManager, 
+		pManager = new PlanetManager(this.mEngine, this.mPhysicsWorld);
+		pSpawner = new PlanetSpawner(this.mEngine, this.mPhysicsWorld, pManager, 
 										comet, this.mPlanetTextureRegion);
 		scene.registerUpdateHandler(pManager);
 		scene.registerUpdateHandler(pSpawner);
@@ -143,7 +152,10 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	}
 	
 	private void createHUD(CameraRotator cameraRotator) {
-		TetraHUD hud = new TetraHUD(this.mFont, this.getVertexBufferObjectManager(), this.comet);
+		ITextureRegion arrowTextures[] = new ITextureRegion[2];
+		arrowTextures[0] = mHoleArrowTextureRegion;
+		arrowTextures[1] = mPlanetArrowTextureRegion;
+		TetraHUD hud = new TetraHUD(this.mFont, this.getVertexBufferObjectManager(), this.comet, arrowTextures, pManager);
 		hud.setOnSceneTouchListener(new TetraTouchHandler(mCamera, cameraRotator, comet));
 		mCamera.setHUD(hud);
 	}

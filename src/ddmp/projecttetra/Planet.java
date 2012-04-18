@@ -16,7 +16,7 @@ public class Planet extends PhysicsConnector {
 	private static final float GRAVITY_CONSTANT = 3.5f;
 	private static final float KILL_DISTANCE_SQUARED = 2250000;
 	/* Relative planet radius. */
-	private static final float GRAVITY_FIELD_DISTANCE = 3.0f;
+	private static final float GRAVITY_FIELD_DISTANCE = 2.5f;
 	
 	private Comet comet;
 	/* Since planets are static their body has mass 0. But mass is needed to calculate
