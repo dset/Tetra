@@ -61,14 +61,12 @@ public class Planet extends PhysicsConnector {
 					Vector2 boostForce = velTmp.cpy().nor().mul(boostScalar);
 					comet.getBody().applyForce(boostForce, comet.getBody().getPosition());
 				}
-			}
-		} else {
-			/* Give comet some extra speed away from planet. */
-			if(isGravitating(new Vector2().set(cometCenterX, cometCenterY))) {
-				float escapeScalar = GRAVITY_CONSTANT * this.mass * comet.getBody().getMass() * this.mass * this.mass
-						/ comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).len();
-				Vector2 escapeForce = velTmp.cpy().nor().mul(escapeScalar);
-				comet.getBody().applyForce(escapeForce, comet.getBody().getPosition());
+			} else {
+				/* Give comet some extra speed away from planet. */
+//				float escapeScalar = GRAVITY_CONSTANT * this.mass * comet.getBody().getMass()
+//						/ comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).len();
+//				Vector2 escapeForce = velTmp.cpy().nor().mul(escapeScalar);
+//				comet.getBody().applyForce(escapeForce, comet.getBody().getPosition());
 			}
 		}
 		float distanceX = getShape().getX() + getShape().getScaleCenterX() - cometCenterX;
