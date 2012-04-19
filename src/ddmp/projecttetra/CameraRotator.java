@@ -69,8 +69,7 @@ public class CameraRotator implements IUpdateHandler {
 			camera.setRotation((float) (slowness * camAngle + goalAngle)
 					/ (slowness + 1));
 		}
-		float zoomFactor = 2.0f/(float)Math.pow(comet.getBody().getLinearVelocity().len(),0.5f);
+		float zoomFactor = 2.5f/(float)Math.pow(comet.getBody().getLinearVelocity().len(),0.5f);
 		camera.setZoomFactor((zoomFactor<1.0f)? zoomFactor : 1.0f);
 	}
-
 }
