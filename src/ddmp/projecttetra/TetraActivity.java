@@ -6,9 +6,7 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
-import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.util.FPSLogger;
-import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.ITexture;
@@ -27,9 +25,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 public class TetraActivity extends SimpleBaseGameActivity {
 
@@ -99,7 +94,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		this.mEngine.registerUpdateHandler(new FPSLogger());
 
 		this.scene = new Scene();
-
+		
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
 		scene.registerUpdateHandler(mPhysicsWorld);
 		
@@ -116,26 +111,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	}
 	
 	private void createComet() {
-		Sprite cometSprite = new Sprite(0, 0, 0.10f * CAMERA_HEIGHT,
-				0.10f * CAMERA_HEIGHT, this.mCometTextureRegion,
-				this.getVertexBufferObjectManager());
-		/*
-		 * Calculate the coordinates for the comet, so its centered on the
-		 * camera.
-		 */
-		float centerX = (CAMERA_WIDTH - cometSprite.getWidth()) / 2;
-		float centerY = (CAMERA_HEIGHT - cometSprite.getHeight()) / 2;
-		cometSprite.setPosition(centerX, centerY);
-		scene.attachChild(cometSprite);
-
-		/* Create the comet body. */
-		FixtureDef cometFixtureDef = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
-		Body cometBody = PhysicsFactory.createCircleBody(this.mPhysicsWorld,
-				cometSprite, BodyType.DynamicBody, cometFixtureDef);
-		cometBody.setLinearVelocity(0, -7);
-		
-		this.comet = new Comet(cometSprite, cometBody, mCamera);
-		this.mPhysicsWorld.registerPhysicsConnector(comet);
+		this.comet = new Comet(mEngine, mPhysicsWorld, this.scene, mCometTextureRegion, mCamera);
+		scene.registerUpdateHandler(comet);
 	}
 	
 	private void createPlanets() {
