@@ -2,24 +2,16 @@ package ddmp.projecttetra;
 
 import org.andengine.engine.Engine;
 import org.andengine.engine.handler.IUpdateHandler;
-import org.andengine.entity.sprite.Sprite;
-import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 /**
  * Spawns planets in the vicinity of the comet.
  */
 public class PlanetSpawner implements IUpdateHandler {
 	
-	private static final FixtureDef PLANET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
-	private static final float PLANET_MIN_SIZE = 0.15f; //In percent of camera height
-	private static final float PLANET_MAX_SIZE = 0.25f;	//In percent of camera height
 	private static final float MIN_SPAWN_TIME = 0.5f;
 	private static final float MAX_SPAWN_TIME = 0.8f;
 	
@@ -49,23 +41,13 @@ public class PlanetSpawner implements IUpdateHandler {
 	public void onUpdate(float pSecondsElapsed) {
 		if (timeSinceSpawn <= 0.0f && planetManager.canSpawn()) {
 			/* Spawn planet */
-			float scale = PLANET_MIN_SIZE + (PLANET_MAX_SIZE - PLANET_MIN_SIZE) * (float) Math.random();
-			float size = scale * TetraActivity.CAMERA_HEIGHT;
-			Vector2 spt = getSpawnPoint(size);
+			Vector2 spt = getSpawnPoint(0); // TODO Should not be 0 here.
 			
 			/* Check so it is not too close to another planet. */
 			if(!planetManager.isGravitated(spt)) {
-
-				Sprite planetSprite = new Sprite(spt.x, spt.y, size, size,
-									this.planetTextureRegion, this.engine.getVertexBufferObjectManager());
-			
-				Body planetBody = PhysicsFactory.createCircleBody(physicsWorld, 
-								planetSprite, BodyType.StaticBody, PLANET_FIXTURE_DEF);
-			
-				Planet planet = new Planet(planetSprite, planetBody, comet, engine);
-			
-				this.engine.getScene().attachChild(planetSprite);
-				this.physicsWorld.registerPhysicsConnector(planet);
+				Planet planet = new Planet(spt.x, spt.y, planetTextureRegion, comet, engine, physicsWorld);
+				engine.getScene().attachChild(planet.getShape());
+				physicsWorld.registerPhysicsConnector(planet.getPhysicsConnector());
 				this.planetManager.addPlanet(planet);
 				timeSinceSpawn = getSpawnTime();
 			}

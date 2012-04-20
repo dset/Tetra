@@ -68,7 +68,7 @@ public class PlanetManager implements IUpdateHandler {
 		
 		engine.getScene().detachChild(planet.getShape());
 		planet.getShape().dispose();
-		physicsWorld.unregisterPhysicsConnector(planet);
+		physicsWorld.unregisterPhysicsConnector(planet.getPhysicsConnector());
 		physicsWorld.destroyBody(planet.getBody());
 		
 		engineLock.unlock();
