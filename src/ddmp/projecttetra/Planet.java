@@ -1,5 +1,7 @@
 package ddmp.projecttetra;
 
+import java.util.List;
+
 import org.andengine.engine.Engine;
 import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.Sprite;
@@ -12,6 +14,7 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 /**
@@ -19,7 +22,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
  */
 public class Planet {
 	
-	private static final FixtureDef PLANET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
+	private static final FixtureDef PLANET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f, true);
 	private static final float PLANET_MIN_SIZE = 0.15f; //In percent of camera height
 	private static final float PLANET_MAX_SIZE = 0.25f;	//In percent of camera height
 	private static final float GRAVITY_CONSTANT = 7f;
@@ -30,6 +33,7 @@ public class Planet {
 	private static final float GRAVITY_ANGLE = (float) (Math.PI/1.5);
 	private static final float BOOST_DISTANCE = 6f;
 	
+	private PhysicsWorld physicsWorld;
 	private PhysicsConnector con;
 	private Body body;
 	private Sprite shape;
@@ -43,6 +47,7 @@ public class Planet {
 	public Planet(float x, float y, ITextureRegion planetTextureRegion, Comet comet, Engine engine,
 					PhysicsWorld physicsWorld) {
 		this.comet = comet;
+		this.physicsWorld = physicsWorld;
 		this.dead = false;
 		
 		float scale = PLANET_MIN_SIZE + (PLANET_MAX_SIZE - PLANET_MIN_SIZE) * (float) Math.random();
@@ -51,6 +56,7 @@ public class Planet {
 				engine.getVertexBufferObjectManager());
 		body = PhysicsFactory.createCircleBody(physicsWorld, shape, 
 				BodyType.StaticBody, PLANET_FIXTURE_DEF);
+		body.getFixtureList().get(0).setUserData(this); /* A bit hacky. */
 		this.con = new PhysicsConnector(shape, body, true, true);
 		
 		this.mass = (float) (Math.PI * Math.pow(shape.getWidthScaled()/2 * (1/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT), 2));
@@ -97,6 +103,31 @@ public class Planet {
 		if(distanceSq > KILL_DISTANCE_SQUARED) {
 			dead = true;
 		}
+		
+		checkForCollisionWithCommet();
+	}
+	
+	private void checkForCollisionWithCommet() {
+		if(dead) {
+			return;
+		}
+		
+		List<Contact> contacts = physicsWorld.getContactList();
+		for(Contact contact : contacts) {
+			if(contact.isTouching()) {
+				Object aData = contact.getFixtureA().getUserData();
+				Object bData = contact.getFixtureB().getUserData();
+				if((aData == this || bData == this) && 
+						(aData instanceof Comet || bData instanceof Comet)) {
+					/* This has collided with comet, break apart. */
+					breakApart();
+				}
+			}
+		}
+	}
+	
+	private void breakApart() {
+		dead = true;
 	}
 	
 	public Body getBody() {

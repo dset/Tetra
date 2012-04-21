@@ -47,6 +47,7 @@ public class Comet implements IUpdateHandler {
 				size, size, cometTextureRegion, engine.getVertexBufferObjectManager());
 		Body cometBody = PhysicsFactory.createCircleBody(physicsWorld, cometSprite, 
 				BodyType.DynamicBody, COMET_FIXTURE_DEF);
+		cometBody.getFixtureList().get(0).setUserData(this); /* A bit hacky. */
 		con = new PhysicsConnector(cometSprite, cometBody, true, false);
 		scene.attachChild(cometSprite);
 		//physicsWorld.registerPhysicsConnector(con); SEE onUpdate
