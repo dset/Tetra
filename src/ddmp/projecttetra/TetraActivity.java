@@ -56,7 +56,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	protected void onCreateResources() {
 		mTextureAtlas = new BuildableBitmapTextureAtlas(
 				this.getTextureManager(), 1024, 1024,
-				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+				TextureOptions.BILINEAR);
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 
 		mCometTextureRegion = BitmapTextureAtlasTextureRegionFactory
