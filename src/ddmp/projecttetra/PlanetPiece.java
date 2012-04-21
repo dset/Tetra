@@ -1,6 +1,7 @@
 package ddmp.projecttetra;
 
 import org.andengine.engine.Engine;
+import org.andengine.engine.Engine.EngineLock;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
@@ -19,6 +20,7 @@ public class PlanetPiece implements IUpdateHandler {
 	
 	private static final FixtureDef PIECE_FIXTURE_DEF = 
 			PhysicsFactory.createFixtureDef(0.1f, 0.5f, 0.5f);
+	private static final float ALPHA_STEP = 0.01f;
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
@@ -41,7 +43,23 @@ public class PlanetPiece implements IUpdateHandler {
 
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
+		con.getShape().setAlpha(con.getShape().getAlpha() - ALPHA_STEP);
+		if(con.getShape().getAlpha() <= 0) {
+			die();
+		}
+	}
+	
+	private void die() {
+		EngineLock engineLock = engine.getEngineLock();
+		engineLock.lock();
 		
+		engine.getScene().detachChild(con.getShape());
+		engine.getScene().unregisterUpdateHandler(this);
+		con.getShape().dispose();
+		physicsWorld.unregisterPhysicsConnector(con);
+		physicsWorld.destroyBody(con.getBody());
+		
+		engineLock.unlock();
 	}
 
 	@Override
