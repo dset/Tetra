@@ -125,7 +125,10 @@ public class Planet {
 		}
 		
 		List<Contact> contacts = physicsWorld.getContactList();
-		for(Contact contact : contacts) {
+		Contact contact = null;
+		int size = contacts.size();
+		for(int i = 0; i < size; i++) {
+			contact = contacts.get(i);
 			if(contact.isTouching()) {
 				Object aData = contact.getFixtureA().getUserData();
 				Object bData = contact.getFixtureB().getUserData();

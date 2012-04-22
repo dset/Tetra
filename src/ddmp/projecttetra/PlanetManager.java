@@ -44,12 +44,12 @@ public class PlanetManager implements IUpdateHandler {
 	
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
-		
-		for(Planet planet : planets) {
-			planet.update();
+		int size = planets.size();
+		for(int i = 0; i < size; i++) {
+			planets.get(i).update();
 		}
 		
-		for(int i = planets.size() - 1; i >= 0; i--) {
+		for(int i = size - 1; i >= 0; i--) {
 			if(planets.get(i).isDead()) {
 				remove(planets.get(i));
 			}

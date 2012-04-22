@@ -1,7 +1,6 @@
 package ddmp.projecttetra;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.Entity;
@@ -19,13 +18,13 @@ public class StarBackground extends Entity {
 	
 	private Comet comet;
 	private Camera camera;
-	private LinkedList<Star> activeStars;
+	private ArrayList<Star> activeStars;
 	private StarPool starPool;
 	
 	public StarBackground(ITextureRegion starTextureRegion, Comet comet, Camera camera) {
 		this.comet = comet;
 		this.camera = camera;
-		this.activeStars = new LinkedList<Star>();
+		this.activeStars = new ArrayList<Star>(NUM_GENERATED_STARS);
 		this.starPool = new StarPool(starTextureRegion, camera, comet.getShape().getVertexBufferObjectManager());
 		this.starPool.generateStars(NUM_GENERATED_STARS, this);
 		setChildrenIgnoreUpdate(true);
@@ -50,13 +49,14 @@ public class StarBackground extends Entity {
 	}
 	
 	private void recycleDeadStars() {
-		Iterator<Star> starIterator = activeStars.iterator();
-		while(starIterator.hasNext()) {
-			Star star = starIterator.next();
+		int size = activeStars.size();
+		Star star = null;
+		for(int i = size - 1; i >= 0; i--) {
+			star = activeStars.get(i);
 			if(star.isDead()) {
 				star.setVisible(false);
 				starPool.recycleStar(star);
-				starIterator.remove();
+				activeStars.remove(star);
 			}
 		}
 	}
