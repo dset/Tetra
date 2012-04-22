@@ -8,6 +8,7 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.region.ITextureRegion;
@@ -71,28 +72,31 @@ public class Planet {
 	
 	public void update() {
 		/* Attract comet by gravity */
-		/* TODO: Very ineffective to create copies of vectors. GC will run often. 
-		 * Should be rewritten so that it doesn't create any objects. */
-		Vector2 planetDir = body.getPosition().cpy().sub(comet.getBody().getPosition());
-		Vector2 velTmp = comet.getBody().getLinearVelocity();
 		float cometCenterX = comet.getShape().getX() + comet.getShape().getScaleCenterX();
 		float cometCenterY = comet.getShape().getY() + comet.getShape().getScaleCenterY();
-		double angle = Math.acos(planetDir.dot(velTmp) / (planetDir.len() * velTmp.len()));
-		
-		if(isGravitating(new Vector2().set(cometCenterX, cometCenterY))) {
+		Vector2 cometCenterPos = Vector2Pool.obtain().set(cometCenterX, cometCenterY);
+		if(isGravitating(cometCenterPos)) {
 			 /* Apply gravity if comet is moving towards or almost towards planet. */
-			if(Math.abs(angle) < GRAVITY_ANGLE) {   
+			Vector2 velTmp = comet.getBody().getLinearVelocity();
+			Vector2 planetDir = Vector2Pool.obtain().set(body.getPosition()).sub(comet.getBody().getPosition());
+			double angle = Math.acos(planetDir.dot(velTmp) / (planetDir.len() * velTmp.len()));
+			Vector2Pool.recycle(planetDir);
+			if(Math.abs(angle) < GRAVITY_ANGLE) {
+				Vector2 distanceVector = Vector2Pool.obtain().set(comet.getBody().getPosition()).sub(this.body.getPosition());
+				float distance = distanceVector.len();
 				float gravityScalar = (float) (-GRAVITY_CONSTANT * this.mass * comet.getBody().getMass()
-						/ comet.getBody().getPosition().cpy().sub(this.body.getPosition()).len());
-				Vector2 gravityForce = comet.getBody().getPosition().cpy().sub(this.body.getPosition()).nor().mul(gravityScalar);
+						/ distance);
+				Vector2 gravityForce = distanceVector.nor().mul(gravityScalar);
 				comet.getBody().applyForce(gravityForce, comet.getBody().getPosition());
+				Vector2Pool.recycle(distanceVector);
 				
 				/* Give comet boost if close to planet. */
-				if (comet.getBody().getPosition().cpy().sub(this.body.getPosition()).len() < BOOST_DISTANCE) {
+				if (distance < BOOST_DISTANCE) {
 					float boostScalar = GRAVITY_CONSTANT * this.mass * comet.getBody().getMass()
-							/ comet.getBody().getPosition().cpy().sub(this.body.getPosition()).len();
-					Vector2 boostForce = velTmp.cpy().nor().mul(boostScalar);
+							/ distance;
+					Vector2 boostForce = Vector2Pool.obtain().set(velTmp).nor().mul(boostScalar);
 					comet.getBody().applyForce(boostForce, comet.getBody().getPosition());
+					Vector2Pool.recycle(boostForce);
 				}
 			} else {
 				/* Give comet some extra speed away from planet. */
@@ -102,6 +106,8 @@ public class Planet {
 //				comet.getBody().applyForce(escapeForce, comet.getBody().getPosition());
 			}
 		}
+		Vector2Pool.recycle(cometCenterPos);
+		
 		float distanceX = shape.getX() + shape.getScaleCenterX() - cometCenterX;
 		float distanceY = shape.getY() + shape.getScaleCenterY() - cometCenterY;
 		float distanceSq = distanceX * distanceX + distanceY * distanceY;

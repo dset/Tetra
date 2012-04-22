@@ -10,6 +10,7 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
 import com.badlogic.gdx.math.Vector2;
@@ -73,12 +74,14 @@ public class Comet implements IUpdateHandler {
 					rotationMatrix[1] * velocity.x + rotationMatrix[3] * velocity.y);
 		}
 		
-		Vector2 tmpVel = con.getBody().getLinearVelocity();
+		Vector2 tmpVel = Vector2Pool.obtain().set(con.getBody().getLinearVelocity());
 		float angle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180/Math.PI + 90);
 		con.getShape().setRotation(-angle);
 		
-		con.getBody().applyForce(velocity.cpy().nor().mul(
-				-FRICTION_COEFFICIENT * pSecondsElapsed * velocity.len2()), con.getBody().getPosition());
+		float lenSq = tmpVel.len2();
+		con.getBody().applyForce(tmpVel.nor().mul(
+				-FRICTION_COEFFICIENT * pSecondsElapsed * lenSq), con.getBody().getPosition());
+		Vector2Pool.recycle(tmpVel);
 		camera.setCenter(con.getShape().getX() + con.getShape().getScaleCenterX(), 
 				con.getShape().getY() + con.getShape().getScaleCenterY());
 		
