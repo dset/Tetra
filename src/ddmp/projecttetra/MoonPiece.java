@@ -16,7 +16,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 /**
  * A piece of a planet.
  */
-public class PlanetPiece implements IUpdateHandler {
+public class MoonPiece implements IUpdateHandler {
 	
 	private static final FixtureDef PIECE_FIXTURE_DEF = 
 			PhysicsFactory.createFixtureDef(0.1f, 0.5f, 0.5f);
@@ -26,7 +26,7 @@ public class PlanetPiece implements IUpdateHandler {
 	private PhysicsWorld physicsWorld;
 	private PhysicsConnector con;
 	
-	public PlanetPiece(float x, float y, float size, ITextureRegion pieceTextureRegion,
+	public MoonPiece(float x, float y, float size, ITextureRegion pieceTextureRegion,
 			Engine engine, PhysicsWorld physicsWorld) {
 		this.engine = engine;
 		this.physicsWorld = physicsWorld;
