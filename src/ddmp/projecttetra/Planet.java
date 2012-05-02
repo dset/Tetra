@@ -156,7 +156,7 @@ public class Planet {
 		
 		private void createMoon(Engine e, PhysicsWorld pW) {
 			float distance = (float) (MIN_DISTANCE + (MAX_DISTANCE - MIN_DISTANCE) * Math.random());
-			distance *= planetSize;
+			distance *= shape.getWidth()/2;
 			float angle = (float) (2 * Math.PI * Math.random());
 			float x = (float) (shape.getX() + shape.getWidth()/2 + distance * Math.cos(angle));
 			float y = (float) (shape.getY() + shape.getHeight()/2 + distance * Math.sin(angle));
