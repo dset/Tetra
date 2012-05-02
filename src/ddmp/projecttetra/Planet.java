@@ -100,6 +100,8 @@ public class Planet {
 		}
 		Vector2Pool.recycle(cometCenterPos);
 		
+		moonManager.updateAll();
+		
 		float distanceX = shape.getX() + shape.getScaleCenterX() - cometCenterX;
 		float distanceY = shape.getY() + shape.getScaleCenterY() - cometCenterY;
 		float distanceSq = distanceX * distanceX + distanceY * distanceY;
@@ -171,6 +173,30 @@ public class Planet {
 			physicsWorld.registerPhysicsConnector(moon.getPhysicsConnector());
 		}
 		
+		public void updateAll() {
+			int size = moons.size();
+			for(int i = 0; i < size; i++) {
+				moons.get(i).update();
+			}
+			
+			EngineLock engineLock = engine.getEngineLock();
+			engineLock.lock();
+			for(int i = size - 1; i >= 0; i--) {
+				if(moons.get(i).isDead()) {
+					remove(moons.get(i));
+				}
+			}
+			engineLock.unlock();
+		}
+		
+		private void remove(Moon moon) {
+			engine.getScene().detachChild(moon.getShape());
+			moon.getShape().dispose();
+			physicsWorld.unregisterPhysicsConnector(moon.getPhysicsConnector());
+			physicsWorld.destroyBody(moon.getBody());
+			moons.remove(moon);
+		}
+		
 		public void killAll() {
 			EngineLock engineLock = engine.getEngineLock();
 			engineLock.lock();
@@ -179,11 +205,7 @@ public class Planet {
 			Moon moon = null;
 			for(int i = size - 1; i >= 0; i--) {
 				moon = moons.get(i);
-				engine.getScene().detachChild(moon.getShape());
-				moon.getShape().dispose();
-				physicsWorld.unregisterPhysicsConnector(moon.getPhysicsConnector());
-				physicsWorld.destroyBody(moon.getBody());
-				moons.remove(moon);
+				remove(moon);
 			}
 			
 			engineLock.unlock();
