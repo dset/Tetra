@@ -21,8 +21,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 public class Planet {
 	
 	private static final FixtureDef PLANET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
-	private static final float PLANET_MIN_SIZE = 0.15f; //In percent of camera height
-	private static final float PLANET_MAX_SIZE = 0.25f;	//In percent of camera height
+	private static final float PLANET_MIN_SIZE = 0.35f; //In percent of camera height
+	private static final float PLANET_MAX_SIZE = 0.55f;	//In percent of camera height
 	private static final float GRAVITY_CONSTANT = 7f;
 	private static final float KILL_DISTANCE_SQUARED = 2250000;
 	/* Relative planet radius. */
