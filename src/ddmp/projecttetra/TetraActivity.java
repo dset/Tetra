@@ -59,7 +59,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		ITextureRegion planetTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "planet_earthlike1.png");
 		ITextureRegion moonTextureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createFromAsset(mTextureAtlas, this, "planet_earthlike1.png");
+				.createFromAsset(mTextureAtlas, this, "moon.png");
 		ITextureRegion starTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "star.png");
 		
