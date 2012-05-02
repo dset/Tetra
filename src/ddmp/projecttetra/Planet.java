@@ -142,8 +142,8 @@ public class Planet {
 	
 	private class MoonManager {
 		
-		private static final float MIN_DISTANCE = 2.0f; /* In planet radii. */
-		private static final float MAX_DISTANCE = 3.5f; /* In planet radii. */
+		private static final float MIN_DISTANCE = 1.75f; /* In planet radii. */
+		private static final float MAX_DISTANCE = 3.0f; /* In planet radii. */
 		private static final int MIN_NUMBER = 3;
 		private static final int MAX_NUMBER = 5;
 		
