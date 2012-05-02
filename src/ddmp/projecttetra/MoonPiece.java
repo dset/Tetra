@@ -14,7 +14,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 /**
- * A piece of a planet.
+ * A piece of a moon.
  */
 public class MoonPiece implements IUpdateHandler {
 	
