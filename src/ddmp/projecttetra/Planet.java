@@ -1,5 +1,7 @@
 package ddmp.projecttetra;
 
+import java.util.ArrayList;
+
 import org.andengine.engine.Engine;
 import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.Sprite;
@@ -8,6 +10,7 @@ import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
+import org.andengine.util.debug.Debug;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -34,6 +37,7 @@ public class Planet {
 	private Body body;
 	private Sprite shape;
 	private Comet comet;
+	private MoonManager moonManager;
 	/* Since planets are static their body has mass 0. But mass is needed to calculate
 	 * effect of gravity. Therefore mass is added. */
 	private float mass;
@@ -54,6 +58,8 @@ public class Planet {
 		
 		this.mass = (float) (Math.PI * Math.pow(shape.getWidthScaled()/2 * (1/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT), 2));
 		this.planetSize = con.getShape().getScaleCenterX()*2;
+		
+		this.moonManager = new MoonManager(engine, physicsWorld);
 	}
 	
 	public void update() {
@@ -129,6 +135,39 @@ public class Planet {
 		} else {
 			return false;
 		}
+	}
+	
+	private class MoonManager {
+		
+		private static final float MIN_DISTANCE = 2.0f; /* In planet radii. */
+		private static final float MAX_DISTANCE = 3.5f; /* In planet radii. */
+		private static final int MIN_NUMBER = 3;
+		private static final int MAX_NUMBER = 5;
+		
+		private ArrayList<Moon> moons;
+		
+		public MoonManager(Engine engine, PhysicsWorld physicsWorld) {
+			moons = new ArrayList<Moon>();
+			int number = (int) (MIN_NUMBER + (MAX_NUMBER - MIN_NUMBER) * Math.random());
+			for(int i = 0; i < number; i++) {
+				createMoon(engine, physicsWorld);
+			}
+		}
+		
+		private void createMoon(Engine e, PhysicsWorld pW) {
+			float distance = (float) (MIN_DISTANCE + (MAX_DISTANCE - MIN_DISTANCE) * Math.random());
+			distance *= planetSize;
+			float angle = (float) (2 * Math.PI * Math.random());
+			float x = (float) (shape.getX() + shape.getWidth()/2 + distance * Math.cos(angle));
+			float y = (float) (shape.getY() + shape.getHeight()/2 + distance * Math.sin(angle));
+			Moon moon = new Moon(x, y, comet, e, pW);
+			moons.add(moon);
+			e.getScene().attachChild(moon.getShape());
+			pW.registerPhysicsConnector(moon.getPhysicsConnector());
+		}
+		
+		
+		
 	}
 
 }

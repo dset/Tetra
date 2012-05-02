@@ -58,6 +58,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 				.createFromAsset(mTextureAtlas, this, "comet.png");
 		ITextureRegion planetTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "planet_earthlike1.png");
+		ITextureRegion moonTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createFromAsset(mTextureAtlas, this, "planet_earthlike1.png");
 		ITextureRegion starTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "star.png");
 		
@@ -78,6 +80,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		RegionManager rM = RegionManager.getInstance();
 		rM.put(RegionManager.Region.COMET, cometTextureRegion);
 		rM.put(RegionManager.Region.PLANET, planetTextureRegion);
+		rM.put(RegionManager.Region.MOON, moonTextureRegion);
 		rM.put(RegionManager.Region.STAR, starTextureRegion);
 		rM.put(RegionManager.Region.ARROW_HOLE, holeArrowTextureRegion);
 		rM.put(RegionManager.Region.ARROW_PLANET, planetArrowTextureRegion);
