@@ -8,7 +8,6 @@ import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
-import org.andengine.opengl.texture.region.ITextureRegion;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -41,14 +40,13 @@ public class Planet {
 	private boolean dead;
 	private float planetSize;
 
-	public Planet(float x, float y, ITextureRegion planetTextureRegion, Comet comet, Engine engine,
-					PhysicsWorld physicsWorld) {
+	public Planet(float x, float y, Comet comet, Engine engine, PhysicsWorld physicsWorld) {
 		this.comet = comet;
 		this.dead = false;
 		
 		float scale = PLANET_MIN_SIZE + (PLANET_MAX_SIZE - PLANET_MIN_SIZE) * (float) Math.random();
 		float size = scale * TetraActivity.CAMERA_HEIGHT;
-		shape = new Sprite(x, y, size, size, planetTextureRegion, 
+		shape = new Sprite(x, y, size, size, RegionManager.getInstance().get(RegionManager.Region.PLANET), 
 				engine.getVertexBufferObjectManager());
 		body = PhysicsFactory.createCircleBody(physicsWorld, shape, 
 				BodyType.StaticBody, PLANET_FIXTURE_DEF);

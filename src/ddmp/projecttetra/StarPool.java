@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.Entity;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 /**
@@ -13,13 +12,11 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
  */
 public class StarPool {
 	
-	private ITextureRegion starTextureRegion;
 	private Camera camera;
 	private VertexBufferObjectManager vertexBufferObjectManager;
 	private LinkedList<Star> pool;
 	
-	public StarPool(ITextureRegion starTextureRegion, Camera camera, VertexBufferObjectManager vertexBufferObjectManager) {
-		this.starTextureRegion = starTextureRegion;
+	public StarPool(Camera camera, VertexBufferObjectManager vertexBufferObjectManager) {
 		this.camera = camera;
 		this.vertexBufferObjectManager = vertexBufferObjectManager;
 		pool = new LinkedList<Star>();
@@ -27,7 +24,7 @@ public class StarPool {
 	
 	public void generateStars(int num, Entity entity) {
 		for(int i = 0; i < num; i++) {
-			Star star = new Star(starTextureRegion, camera, vertexBufferObjectManager);
+			Star star = new Star(camera, vertexBufferObjectManager);
 			pool.add(star);
 			entity.attachChild(star);
 		}

@@ -32,11 +32,6 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	public static final int CAMERA_HEIGHT = 720;
 
 	private BuildableBitmapTextureAtlas mTextureAtlas;
-	private ITextureRegion mCometTextureRegion;
-	private ITextureRegion mPlanetTextureRegion;
-	private ITextureRegion mStarTextureRegion;
-	private ITextureRegion mHoleArrowTextureRegion;
-	private ITextureRegion mPlanetArrowTextureRegion;
 	private PlanetManager pManager;
 	private PlanetSpawner pSpawner;
 	private Font mFont;
@@ -59,16 +54,16 @@ public class TetraActivity extends SimpleBaseGameActivity {
 				TextureOptions.BILINEAR);
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 
-		mCometTextureRegion = BitmapTextureAtlasTextureRegionFactory
+		ITextureRegion cometTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "comet.png");
-		mPlanetTextureRegion = BitmapTextureAtlasTextureRegionFactory
+		ITextureRegion planetTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "planet_earthlike1.png");
-		mStarTextureRegion = BitmapTextureAtlasTextureRegionFactory
+		ITextureRegion starTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "star.png");
 		
-		mHoleArrowTextureRegion = BitmapTextureAtlasTextureRegionFactory
+		ITextureRegion holeArrowTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "holearrow.png");
-		mPlanetArrowTextureRegion = BitmapTextureAtlasTextureRegionFactory
+		ITextureRegion planetArrowTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createFromAsset(mTextureAtlas, this, "planetarrow.png");
 		
 		try {
@@ -78,6 +73,14 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		} catch (final TextureAtlasBuilderException e) {
 			Debug.e(e);
 		}
+		this.mTextureAtlas.load();
+		
+		RegionManager rM = RegionManager.getInstance();
+		rM.put(RegionManager.Region.COMET, cometTextureRegion);
+		rM.put(RegionManager.Region.PLANET, planetTextureRegion);
+		rM.put(RegionManager.Region.STAR, starTextureRegion);
+		rM.put(RegionManager.Region.ARROW_HOLE, holeArrowTextureRegion);
+		rM.put(RegionManager.Region.ARROW_PLANET, planetArrowTextureRegion);
 
 		final ITexture fontTexture = new BitmapTextureAtlas(
 				this.getTextureManager(), 256, 256, TextureOptions.BILINEAR);
@@ -85,8 +88,6 @@ public class TetraActivity extends SimpleBaseGameActivity {
 				Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 20, true,
 				Color.WHITE);
 		this.mFont.load();
-
-		this.mTextureAtlas.load();
 	}
 
 	@Override
@@ -111,28 +112,24 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	}
 	
 	private void createComet() {
-		this.comet = new Comet(mEngine, mPhysicsWorld, this.scene, mCometTextureRegion, mCamera);
+		this.comet = new Comet(mEngine, mPhysicsWorld, this.scene, mCamera);
 		scene.registerUpdateHandler(comet);
 	}
 	
 	private void createPlanets() {
 		pManager = new PlanetManager(this.mEngine, this.mPhysicsWorld);
-		pSpawner = new PlanetSpawner(this.mEngine, this.mPhysicsWorld, pManager, 
-										comet, this.mPlanetTextureRegion);
+		pSpawner = new PlanetSpawner(this.mEngine, this.mPhysicsWorld, pManager, comet);
 		scene.registerUpdateHandler(pManager);
 		scene.registerUpdateHandler(pSpawner);
 	}
 	
 	private void createBackground() {
 		scene.setBackground(new Background(0f, 0f, 0f));
-		scene.attachChild( new StarBackground(mStarTextureRegion, comet, mCamera), 0);
+		scene.attachChild( new StarBackground(comet, mCamera), 0);
 	}
 	
 	private void createHUD(CameraRotator cameraRotator) {
-		ITextureRegion arrowTextures[] = new ITextureRegion[2];
-		arrowTextures[0] = mHoleArrowTextureRegion;
-		arrowTextures[1] = mPlanetArrowTextureRegion;
-		TetraHUD hud = new TetraHUD(this.mFont, this.getVertexBufferObjectManager(), this.comet, arrowTextures, pManager);
+		TetraHUD hud = new TetraHUD(this.mFont, this.getVertexBufferObjectManager(), this.comet, pManager);
 		hud.setOnSceneTouchListener(new TetraTouchHandler(mCamera, cameraRotator, comet));
 		mCamera.setHUD(hud);
 	}

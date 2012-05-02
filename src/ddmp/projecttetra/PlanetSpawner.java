@@ -3,7 +3,6 @@ package ddmp.projecttetra;
 import org.andengine.engine.Engine;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
-import org.andengine.opengl.texture.region.ITextureRegion;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -19,7 +18,6 @@ public class PlanetSpawner implements IUpdateHandler {
 	private PhysicsWorld physicsWorld;
 	private PlanetManager planetManager;
 	private Comet comet;
-	private ITextureRegion planetTextureRegion;
 	private float timeSinceSpawn;
 	
 	/* Vector that is reused over and over instead of creating a new
@@ -27,12 +25,11 @@ public class PlanetSpawner implements IUpdateHandler {
 	private Vector2 spawnPoint;
 	
 	public PlanetSpawner(Engine engine, PhysicsWorld physicsWorld, PlanetManager pManager, 
-										Comet comet, ITextureRegion planetTextureRegion) {
+										Comet comet) {
 		this.engine = engine;
 		this.physicsWorld = physicsWorld;
 		this.planetManager = pManager;
 		this.comet = comet;
-		this.planetTextureRegion = planetTextureRegion;
 		spawnPoint = new Vector2();
 		timeSinceSpawn = getSpawnTime();
 	}
@@ -45,7 +42,7 @@ public class PlanetSpawner implements IUpdateHandler {
 			
 			/* Check so it is not too close to another planet. */
 			if(!planetManager.isGravitated(spt)) {
-				Planet planet = new Planet(spt.x, spt.y, planetTextureRegion, comet, engine, physicsWorld);
+				Planet planet = new Planet(spt.x, spt.y, comet, engine, physicsWorld);
 				engine.getScene().attachChild(planet.getShape());
 				physicsWorld.registerPhysicsConnector(planet.getPhysicsConnector());
 				this.planetManager.addPlanet(planet);

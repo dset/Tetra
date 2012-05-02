@@ -6,7 +6,6 @@ import org.andengine.engine.camera.Camera;
 import org.andengine.entity.Entity;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
-import org.andengine.opengl.texture.region.ITextureRegion;
 
 public class StarBackground extends Entity {
 	/* The number of stars generated for the pool stars are chosen from. */
@@ -21,11 +20,11 @@ public class StarBackground extends Entity {
 	private ArrayList<Star> activeStars;
 	private StarPool starPool;
 	
-	public StarBackground(ITextureRegion starTextureRegion, Comet comet, Camera camera) {
+	public StarBackground(Comet comet, Camera camera) {
 		this.comet = comet;
 		this.camera = camera;
 		this.activeStars = new ArrayList<Star>(NUM_GENERATED_STARS);
-		this.starPool = new StarPool(starTextureRegion, camera, comet.getShape().getVertexBufferObjectManager());
+		this.starPool = new StarPool(camera, comet.getShape().getVertexBufferObjectManager());
 		this.starPool.generateStars(NUM_GENERATED_STARS, this);
 		setChildrenIgnoreUpdate(true);
 		spawnInitialStars();

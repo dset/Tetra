@@ -29,24 +29,22 @@ public class Moon {
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
-	private ITextureRegion moonTextureRegion;
 	private PhysicsConnector con;
 	private Body body;
 	private Sprite shape;
 	private Comet comet;
 	private boolean dead;
 
-	public Moon(float x, float y, ITextureRegion moonTextureRegion, Comet comet, Engine engine,
+	public Moon(float x, float y, Comet comet, Engine engine,
 					PhysicsWorld physicsWorld) {
 		this.comet = comet;
 		this.engine = engine;
 		this.physicsWorld = physicsWorld;
-		this.moonTextureRegion = moonTextureRegion;
 		this.dead = false;
 		
 		float scale = MOON_MIN_SIZE + (MOON_MAX_SIZE - MOON_MIN_SIZE) * (float) Math.random();
 		float size = scale * TetraActivity.CAMERA_HEIGHT;
-		shape = new Sprite(x, y, size, size, moonTextureRegion, 
+		shape = new Sprite(x, y, size, size, RegionManager.getInstance().get(RegionManager.Region.MOON), 
 				engine.getVertexBufferObjectManager());
 		body = PhysicsFactory.createCircleBody(physicsWorld, shape, 
 				BodyType.StaticBody, MOON_FIXTURE_DEF);
@@ -92,6 +90,7 @@ public class Moon {
 	
 	private void breakApart() {
 		dead = true;
+		ITextureRegion moonTextureRegion = RegionManager.getInstance().get(RegionManager.Region.MOON);
 		ITexture texture = moonTextureRegion.getTexture();
 		int tX = (int) moonTextureRegion.getTextureX();
 		int tY = (int) moonTextureRegion.getTextureY();

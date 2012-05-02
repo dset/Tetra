@@ -24,11 +24,12 @@ public class TetraHUD extends HUD {
 //	private PlanetManager pManager;
 	private Comet comet;
 
-	public TetraHUD(Font font, VertexBufferObjectManager VBOM, Comet comet,
-			ITextureRegion arrowTextures[], PlanetManager pManager) {
+	public TetraHUD(Font font, VertexBufferObjectManager VBOM, Comet comet, PlanetManager pManager) {
 		super();
 		this.comet = comet;
-		this.arrowTextures = arrowTextures;
+		this.arrowTextures = new ITextureRegion[2];
+		arrowTextures[0] = RegionManager.getInstance().get(RegionManager.Region.ARROW_HOLE);
+		arrowTextures[1] = RegionManager.getInstance().get(RegionManager.Region.ARROW_PLANET);
 //		this.pManager = pManager;
 		this.fpsText = new Text(50, 700, font, "FPS:",
 				"FPS: XXXXXXXXXXX".length(), VBOM);

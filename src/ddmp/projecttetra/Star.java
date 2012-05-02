@@ -2,7 +2,6 @@ package ddmp.projecttetra;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 public class Star extends Sprite {
@@ -14,8 +13,8 @@ public class Star extends Sprite {
 	
 	private Camera camera;
 	
-	public Star(ITextureRegion starTextureRegion, Camera camera, VertexBufferObjectManager vertexBufferObjectManager) {
-		super(0, 0, starTextureRegion, vertexBufferObjectManager);
+	public Star(Camera camera, VertexBufferObjectManager vertexBufferObjectManager) {
+		super(0, 0, RegionManager.getInstance().get(RegionManager.Region.STAR), vertexBufferObjectManager);
 		
 		float size = (STAR_MIN_SIZE + (float) Math.random() * (STAR_MAX_SIZE - STAR_MIN_SIZE)) * camera.getHeight();
 		setSize(size, size);

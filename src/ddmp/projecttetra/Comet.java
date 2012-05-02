@@ -11,7 +11,6 @@ import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.Vector2Pool;
-import org.andengine.opengl.texture.region.ITextureRegion;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -36,8 +35,7 @@ public class Comet implements IUpdateHandler {
 	private boolean turnRight;
 	private Camera camera;
 
-	public Comet(Engine engine, PhysicsWorld physicsWorld, Scene scene, 
-			ITextureRegion cometTextureRegion, Camera camera) {
+	public Comet(Engine engine, PhysicsWorld physicsWorld, Scene scene, Camera camera) {
 		this.camera = camera;
 		rotationMatrix = new float[4];
 		turnLeft = false;
@@ -45,7 +43,8 @@ public class Comet implements IUpdateHandler {
 		
 		float size = COMET_SIZE * camera.getHeight();
 		Sprite cometSprite = new Sprite((camera.getWidth() - size) / 2, (camera.getHeight() - size) / 2,
-				size, size, cometTextureRegion, engine.getVertexBufferObjectManager());
+				size, size, RegionManager.getInstance().get(RegionManager.Region.COMET), 
+				engine.getVertexBufferObjectManager());
 		Body cometBody = PhysicsFactory.createCircleBody(physicsWorld, cometSprite, 
 				BodyType.DynamicBody, COMET_FIXTURE_DEF);
 		cometBody.getFixtureList().get(0).setUserData(this); /* A bit hacky. */
