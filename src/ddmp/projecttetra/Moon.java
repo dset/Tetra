@@ -18,7 +18,7 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 /**
- * A planet in the game.
+ * A moon in the game.
  */
 public class Moon {
 	
