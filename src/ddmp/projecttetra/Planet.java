@@ -3,6 +3,7 @@ package ddmp.projecttetra;
 import java.util.ArrayList;
 
 import org.andengine.engine.Engine;
+import org.andengine.engine.Engine.EngineLock;
 import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsConnector;
@@ -10,7 +11,6 @@ import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
-import org.andengine.util.debug.Debug;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -106,6 +106,7 @@ public class Planet {
 		/* Die if far away from comet */
 		if(distanceSq > KILL_DISTANCE_SQUARED) {
 			dead = true;
+			moonManager.killAll();
 		}
 		
 	}
@@ -144,29 +145,49 @@ public class Planet {
 		private static final int MIN_NUMBER = 3;
 		private static final int MAX_NUMBER = 5;
 		
+		private Engine engine;
+		private PhysicsWorld physicsWorld;
 		private ArrayList<Moon> moons;
 		
 		public MoonManager(Engine engine, PhysicsWorld physicsWorld) {
+			this.engine = engine;
+			this.physicsWorld = physicsWorld;
 			moons = new ArrayList<Moon>();
 			int number = (int) (MIN_NUMBER + (MAX_NUMBER - MIN_NUMBER) * Math.random());
 			for(int i = 0; i < number; i++) {
-				createMoon(engine, physicsWorld);
+				createMoon();
 			}
 		}
 		
-		private void createMoon(Engine e, PhysicsWorld pW) {
+		private void createMoon() {
 			float distance = (float) (MIN_DISTANCE + (MAX_DISTANCE - MIN_DISTANCE) * Math.random());
 			distance *= shape.getWidth()/2;
 			float angle = (float) (2 * Math.PI * Math.random());
 			float x = (float) (shape.getX() + shape.getWidth()/2 + distance * Math.cos(angle));
 			float y = (float) (shape.getY() + shape.getHeight()/2 + distance * Math.sin(angle));
-			Moon moon = new Moon(x, y, comet, e, pW);
+			Moon moon = new Moon(x, y, engine, physicsWorld);
 			moons.add(moon);
-			e.getScene().attachChild(moon.getShape());
-			pW.registerPhysicsConnector(moon.getPhysicsConnector());
+			engine.getScene().attachChild(moon.getShape());
+			physicsWorld.registerPhysicsConnector(moon.getPhysicsConnector());
 		}
 		
-		
+		public void killAll() {
+			EngineLock engineLock = engine.getEngineLock();
+			engineLock.lock();
+			
+			int size = moons.size();
+			Moon moon = null;
+			for(int i = size - 1; i >= 0; i--) {
+				moon = moons.get(i);
+				engine.getScene().detachChild(moon.getShape());
+				moon.getShape().dispose();
+				physicsWorld.unregisterPhysicsConnector(moon.getPhysicsConnector());
+				physicsWorld.destroyBody(moon.getBody());
+				moons.remove(moon);
+			}
+			
+			engineLock.unlock();
+		}
 		
 	}
 

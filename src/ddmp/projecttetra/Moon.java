@@ -25,19 +25,15 @@ public class Moon {
 	private static final FixtureDef MOON_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f, true);
 	private static final float MOON_MIN_SIZE = 0.15f; //In percent of camera height
 	private static final float MOON_MAX_SIZE = 0.25f;	//In percent of camera height
-	private static final float KILL_DISTANCE_SQUARED = 2250000;
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
 	private PhysicsConnector con;
 	private Body body;
 	private Sprite shape;
-	private Comet comet;
 	private boolean dead;
 
-	public Moon(float x, float y, Comet comet, Engine engine,
-					PhysicsWorld physicsWorld) {
-		this.comet = comet;
+	public Moon(float x, float y, Engine engine, PhysicsWorld physicsWorld) {
 		this.engine = engine;
 		this.physicsWorld = physicsWorld;
 		this.dead = false;
@@ -53,16 +49,6 @@ public class Moon {
 	}
 	
 	public void update() {
-		float cometCenterX = comet.getShape().getX() + comet.getShape().getScaleCenterX();
-		float cometCenterY = comet.getShape().getY() + comet.getShape().getScaleCenterY();
-		float distanceX = shape.getX() + shape.getScaleCenterX() - cometCenterX;
-		float distanceY = shape.getY() + shape.getScaleCenterY() - cometCenterY;
-		float distanceSq = distanceX * distanceX + distanceY * distanceY;
-		/* Die if far away from comet */
-		if(distanceSq > KILL_DISTANCE_SQUARED) {
-			dead = true;
-		}
-		
 		checkForCollisionWithCommet();
 	}
 	
