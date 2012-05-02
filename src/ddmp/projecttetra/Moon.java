@@ -23,8 +23,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 public class Moon {
 	
 	private static final FixtureDef MOON_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f, true);
-	private static final float MOON_MIN_SIZE = 0.15f; //In percent of camera height
-	private static final float MOON_MAX_SIZE = 0.25f;	//In percent of camera height
+	private static final float MOON_MIN_SIZE = 0.08f; //In percent of camera height
+	private static final float MOON_MAX_SIZE = 0.12f;	//In percent of camera height
 	
 	private Engine engine;
 	private PhysicsWorld physicsWorld;
