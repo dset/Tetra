@@ -17,6 +17,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
+import ddmp.projecttetra.entity.MoonPiece;
+
 /**
  * A moon in the game.
  */
@@ -90,10 +92,10 @@ public class Moon {
 		float sX = shape.getX();
 		float sY = shape.getY();
 		float size = shape.getWidth() / 2;
-		new MoonPiece(sX, sY, size, reg1, engine, physicsWorld);
-		new MoonPiece(sX+size, sY, size, reg2, engine, physicsWorld);
-		new MoonPiece(sX, sY+size, size, reg3, engine, physicsWorld);
-		new MoonPiece(sX+size, sY+size, size, reg4, engine, physicsWorld);
+		MoonPiece.createMoonPiece(engine, physicsWorld, sX, sY, size, reg1).registerSelf();
+		MoonPiece.createMoonPiece(engine, physicsWorld, sX+size, sY, size, reg2).registerSelf();
+		MoonPiece.createMoonPiece(engine, physicsWorld, sX, sY+size, size, reg3).registerSelf();
+		MoonPiece.createMoonPiece(engine, physicsWorld, sX+size, sY+size, size, reg4).registerSelf();
 	}
 	
 	public Body getBody() {
