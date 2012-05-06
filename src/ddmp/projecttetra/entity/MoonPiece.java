@@ -28,7 +28,7 @@ public class MoonPiece extends Entity {
 		return new MoonPiece(engine, physicsWorld, sprite, body);
 	}
 	
-	public MoonPiece(Engine engine, PhysicsWorld physicsWorld, Sprite sprite, Body body) {
+	private MoonPiece(Engine engine, PhysicsWorld physicsWorld, Sprite sprite, Body body) {
 		super(engine, physicsWorld, sprite, body);
 	}
 
