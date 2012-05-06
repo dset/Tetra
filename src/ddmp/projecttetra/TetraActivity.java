@@ -26,6 +26,8 @@ import android.graphics.Typeface;
 
 import com.badlogic.gdx.math.Vector2;
 
+import ddmp.projecttetra.entity.Comet;
+
 public class TetraActivity extends SimpleBaseGameActivity {
 
 	public static final int CAMERA_WIDTH = 480;
@@ -115,8 +117,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	}
 	
 	private void createComet() {
-		this.comet = new Comet(mEngine, mPhysicsWorld, this.scene, mCamera);
-		scene.registerUpdateHandler(comet);
+		this.comet = Comet.createComet(mEngine, mPhysicsWorld);
+		this.comet.registerSelf();
 	}
 	
 	private void createPlanets() {
