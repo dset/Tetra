@@ -5,6 +5,8 @@ import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.input.touch.TouchEvent;
 
+import ddmp.projecttetra.entity.Comet;
+
 /**
  * Handles the touch events in the game.
  */

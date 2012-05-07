@@ -15,7 +15,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
-import ddmp.projecttetra.Comet;
 import ddmp.projecttetra.RegionManager;
 import ddmp.projecttetra.TetraActivity;
 

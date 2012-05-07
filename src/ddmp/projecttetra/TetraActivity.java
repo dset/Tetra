@@ -130,7 +130,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	
 	private void createBackground() {
 		scene.setBackground(new Background(0f, 0f, 0f));
-		scene.attachChild( new StarBackground(comet, mCamera), 0);
+		scene.attachChild( new StarBackground(comet, mCamera, mEngine), 0);
 	}
 	
 	private void createHUD(CameraRotator cameraRotator) {
