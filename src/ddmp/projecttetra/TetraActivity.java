@@ -122,7 +122,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	}
 	
 	private void createPlanets() {
-		pManager = new PlanetManager(this.mEngine, this.mPhysicsWorld);
+		pManager = new PlanetManager();
 		pSpawner = new PlanetSpawner(this.mEngine, this.mPhysicsWorld, pManager, comet);
 		scene.registerUpdateHandler(pManager);
 		scene.registerUpdateHandler(pSpawner);

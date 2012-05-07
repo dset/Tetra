@@ -2,29 +2,22 @@ package ddmp.projecttetra;
 
 import java.util.ArrayList;
 
-import org.andengine.engine.Engine;
-import org.andengine.engine.Engine.EngineLock;
 import org.andengine.engine.handler.IUpdateHandler;
-import org.andengine.extension.physics.box2d.PhysicsWorld;
 
 import com.badlogic.gdx.math.Vector2;
 
+import ddmp.projecttetra.entity.Planet;
+
 /**
- * Manages all the planets currently spawned in the game. Makes
- * sure that the planets update on engine updates and that they
- * are removed when dead.
+ * Holds a reference to all planets currently spawned in game.
  */
 public class PlanetManager implements IUpdateHandler {
 	
 	private static final int MAX_SPAWNED_PLANETS = 20;
 	
-	private Engine engine;
-	private PhysicsWorld physicsWorld;
 	private ArrayList<Planet> planets;
 	
-	public PlanetManager(Engine engine, PhysicsWorld physicsWorld) {
-		this.engine = engine;
-		this.physicsWorld = physicsWorld;
+	public PlanetManager() {
 		planets = new ArrayList<Planet>();
 	}
 	
@@ -45,13 +38,9 @@ public class PlanetManager implements IUpdateHandler {
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
 		int size = planets.size();
-		for(int i = 0; i < size; i++) {
-			planets.get(i).update();
-		}
-		
 		for(int i = size - 1; i >= 0; i--) {
-			if(planets.get(i).isDead()) {
-				remove(planets.get(i));
+			if(planets.get(i).isDestroyed()) {
+				planets.remove(planets.get(i));
 			}
 		}
 	}
@@ -60,23 +49,6 @@ public class PlanetManager implements IUpdateHandler {
 	public void reset() {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	private void remove(Planet planet) {
-		EngineLock engineLock = engine.getEngineLock();
-		engineLock.lock();
-		
-		engine.getScene().detachChild(planet.getShape());
-		planet.getShape().dispose();
-		physicsWorld.unregisterPhysicsConnector(planet.getPhysicsConnector());
-		physicsWorld.destroyBody(planet.getBody());
-		
-		engineLock.unlock();
-		planets.remove(planet);
-	}
-	
-	public ArrayList<Planet> getPlanets(){
-		return planets;
 	}
 
 	public boolean isGravitated(Vector2 point) {
