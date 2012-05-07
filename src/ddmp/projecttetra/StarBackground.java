@@ -2,10 +2,13 @@ package ddmp.projecttetra;
 
 import java.util.ArrayList;
 
+import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.Entity;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
+
+import ddmp.projecttetra.entity.Comet;
 
 public class StarBackground extends Entity {
 	/* The number of stars generated for the pool stars are chosen from. */
@@ -20,11 +23,11 @@ public class StarBackground extends Entity {
 	private ArrayList<Star> activeStars;
 	private StarPool starPool;
 	
-	public StarBackground(Comet comet, Camera camera) {
+	public StarBackground(Comet comet, Camera camera, Engine engine) {
 		this.comet = comet;
 		this.camera = camera;
 		this.activeStars = new ArrayList<Star>(NUM_GENERATED_STARS);
-		this.starPool = new StarPool(camera, comet.getShape().getVertexBufferObjectManager());
+		this.starPool = new StarPool(camera, engine.getVertexBufferObjectManager());
 		this.starPool.generateStars(NUM_GENERATED_STARS, this);
 		setChildrenIgnoreUpdate(true);
 		spawnInitialStars();
@@ -61,8 +64,8 @@ public class StarBackground extends Entity {
 	}
 	
 	private void updatePosition(float pSecondsElapsed) {
-		float vX = comet.getBody().getLinearVelocity().x * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT * RELATIVE_SPEED;
-		float vY = comet.getBody().getLinearVelocity().y * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT * RELATIVE_SPEED;
+		float vX = comet.getLinearVelocity().x * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT * RELATIVE_SPEED;
+		float vY = comet.getLinearVelocity().y * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT * RELATIVE_SPEED;
 		this.setPosition(this.getX() + vX * pSecondsElapsed, this.getY() + vY * pSecondsElapsed);
 	}
 	
@@ -74,7 +77,7 @@ public class StarBackground extends Entity {
 	
 	private void spawnStarOutsideView() {
 		float spawnDistance = getSpawnDistance();
-		double angle = Math.atan2(comet.getBody().getLinearVelocity().y, comet.getBody().getLinearVelocity().x);
+		double angle = Math.atan2(comet.getLinearVelocity().y, comet.getLinearVelocity().x);
 		angle += Math.PI/4 - Math.random() * Math.PI/2;
 		spawnStar(spawnDistance, (float) angle);
 	}
