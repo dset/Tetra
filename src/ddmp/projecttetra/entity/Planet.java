@@ -30,7 +30,7 @@ public class Planet extends Entity {
 	private static final float PLANET_MIN_SIZE = 0.35f; //In percent of camera height
 	private static final float PLANET_MAX_SIZE = 0.55f;	//In percent of camera height
 	private static final float GRAVITY_CONSTANT = 7f;
-	private static final float KILL_DISTANCE_SQUARED = 2250000;
+	private static final float KILL_DISTANCE = 1500;
 	/* Relative planet radius. */
 	private static final float GRAVITY_FIELD_DISTANCE = 5f;
 	/* Angle to determine when to apply gravity. */
@@ -67,30 +67,27 @@ public class Planet extends Entity {
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
 		/* Attract comet by gravity */
-		float cometCenterX = comet.getShape().getX() + comet.getShape().getScaleCenterX();
-		float cometCenterY = comet.getShape().getY() + comet.getShape().getScaleCenterY();
-		Vector2 cometCenterPos = Vector2Pool.obtain().set(cometCenterX, cometCenterY);
+		Vector2 cometCenterPos = comet.getCenter();
 		if(isGravitating(cometCenterPos)) {
 			 /* Apply gravity if comet is moving towards or almost towards planet. */
-			Vector2 velTmp = comet.getBody().getLinearVelocity();
-			Vector2 planetDir = Vector2Pool.obtain().set(body.getPosition()).sub(comet.getBody().getPosition());
-			double angle = Math.acos(planetDir.dot(velTmp) / (planetDir.len() * velTmp.len()));
-			Vector2Pool.recycle(planetDir);
+			Vector2 velTmp = comet.getLinearVelocity();
+			Vector2 centerPosition = getCenter();
+			Vector2 cometCenterPosition = comet.getCenter();
+			Vector2 direction = centerPosition.sub(cometCenterPosition);
+			double angle = Math.acos(direction.dot(velTmp) / (direction.len() * velTmp.len()));
 			if(Math.abs(angle) < GRAVITY_ANGLE) {
-				Vector2 distanceVector = Vector2Pool.obtain().set(comet.getBody().getPosition()).sub(this.body.getPosition());
-				float distance = distanceVector.len();
-				float gravityScalar = (float) (-GRAVITY_CONSTANT * this.mass * comet.getBody().getMass()
+				float distance = getDistanceMeters(comet);
+				direction = direction.nor();
+				float gravityScalar = (float) (GRAVITY_CONSTANT * mass * comet.getMass()
 						/ distance);
-				Vector2 gravityForce = distanceVector.nor().mul(gravityScalar);
-				comet.getBody().applyForce(gravityForce, comet.getBody().getPosition());
-				Vector2Pool.recycle(distanceVector);
+				Vector2 gravityForce = direction.mul(gravityScalar);
+				comet.applyForce(gravityForce.x, gravityForce.y);
 				
 				/* Give comet boost if close to planet. */
 				if (distance < BOOST_DISTANCE) {
-					float boostScalar = GRAVITY_CONSTANT * this.mass * comet.getBody().getMass()
-							/ distance;
+					float boostScalar = GRAVITY_CONSTANT * mass * comet.getMass() / distance;
 					Vector2 boostForce = Vector2Pool.obtain().set(velTmp).nor().mul(boostScalar);
-					comet.getBody().applyForce(boostForce, comet.getBody().getPosition());
+					comet.applyForce(boostForce.x, boostForce.y);
 					Vector2Pool.recycle(boostForce);
 				}
 			} else {
@@ -100,18 +97,16 @@ public class Planet extends Entity {
 //				Vector2 escapeForce = velTmp.cpy().nor().mul(escapeScalar);
 //				comet.getBody().applyForce(escapeForce, comet.getBody().getPosition());
 			}
+			Vector2Pool.recycle(centerPosition);
+			Vector2Pool.recycle(cometCenterPosition);
 		}
 		Vector2Pool.recycle(cometCenterPos);
 		
 		moonManager.updateAll();
 		
-		float distanceX = shape.getX() + shape.getScaleCenterX() - cometCenterX;
-		float distanceY = shape.getY() + shape.getScaleCenterY() - cometCenterY;
-		float distanceSq = distanceX * distanceX + distanceY * distanceY;
 		/* Die if far away from comet */
-		if(distanceSq > KILL_DISTANCE_SQUARED) {
-			dead = true;
-			moonManager.killAll();
+		if(getDistancePixels(comet) > KILL_DISTANCE) {
+			destroySelf();
 		}
 		
 	}
@@ -122,14 +117,11 @@ public class Planet extends Entity {
 	}
 
 	public boolean isGravitating(Vector2 point) {
-		float distanceX = shape.getX() + shape.getScaleCenterX() - point.x;
-		float distanceY = shape.getY() + shape.getScaleCenterY() - point.y;
-		float distanceSq = distanceX * distanceX + distanceY * distanceY;
-		if(distanceSq < Math.pow(GRAVITY_FIELD_DISTANCE * planetSize, 2)){
-			return true;
-		} else {
-			return false;
-		}
+		Vector2 centerPosition = getCenter();
+		float distance = centerPosition.dst(point);
+		Vector2Pool.recycle(centerPosition);
+		
+		return distance < GRAVITY_FIELD_DISTANCE * getWidth() / 2;
 	}
 	
 	private class MoonManager {
