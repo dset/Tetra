@@ -11,6 +11,8 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import ddmp.projecttetra.entity.Comet;
+
 /**
  * The HUD visible to the player in game.
  */
@@ -66,9 +68,9 @@ public class TetraHUD extends HUD {
 	public void onManagedUpdate(float pSecondsElapsed) {
 		super.onManagedUpdate(pSecondsElapsed);
 
-		scoreText.setText("Score: " + (int) (-comet.getShape().getY()));
-		setSidePosition(holeArrowSprite, (float) Math.atan2(comet.getBody()
-				.getLinearVelocity().x, comet.getBody().getLinearVelocity().y));
+		scoreText.setText("Score: " + (int) (-comet.getCenterY()));
+		setSidePosition(holeArrowSprite, (float) Math.atan2(comet.getLinearVelocity().x,
+				comet.getLinearVelocity().y));
 
 		/*ArrayList<Planet> planets = pManager.getPlanets();
 		Planet topPlanets[] = new Planet[3];
