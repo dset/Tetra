@@ -1,12 +1,7 @@
 package ddmp.projecttetra.entity;
 
-import java.util.ArrayList;
-
 import org.andengine.engine.Engine;
-import org.andengine.engine.Engine.EngineLock;
-import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.Vector2Pool;
@@ -38,7 +33,6 @@ public class Planet extends Entity {
 	private static final float BOOST_DISTANCE = 6f;
 	
 	private Comet comet;
-	private MoonManager moonManager;
 	/* Since planets are static their body has mass 0. But mass is needed to calculate
 	 * effect of gravity. Therefore mass is added. */
 	private float mass;
@@ -61,7 +55,6 @@ public class Planet extends Entity {
 		this.mass = (float) (Math.PI * Math.pow(sprite.getWidthScaled()/2 *
 				(1/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT), 2));
 		this.comet = comet;
-		this.moonManager = new MoonManager(engine, physicsWorld);
 	}
 	
 	@Override
@@ -102,8 +95,6 @@ public class Planet extends Entity {
 		}
 		Vector2Pool.recycle(cometCenterPos);
 		
-		moonManager.updateAll();
-		
 		/* Die if far away from comet */
 		if(getDistancePixels(comet) > KILL_DISTANCE) {
 			destroySelf();
@@ -122,78 +113,5 @@ public class Planet extends Entity {
 		Vector2Pool.recycle(centerPosition);
 		
 		return distance < GRAVITY_FIELD_DISTANCE * getWidth() / 2;
-	}
-	
-	private class MoonManager {
-		
-		private static final float MIN_DISTANCE = 1.75f; /* In planet radii. */
-		private static final float MAX_DISTANCE = 3.0f; /* In planet radii. */
-		private static final int MIN_NUMBER = 3;
-		private static final int MAX_NUMBER = 5;
-		
-		private Engine engine;
-		private PhysicsWorld physicsWorld;
-		private ArrayList<Moon> moons;
-		
-		public MoonManager(Engine engine, PhysicsWorld physicsWorld) {
-			this.engine = engine;
-			this.physicsWorld = physicsWorld;
-			moons = new ArrayList<Moon>();
-			int number = (int) (MIN_NUMBER + (MAX_NUMBER - MIN_NUMBER) * Math.random());
-			for(int i = 0; i < number; i++) {
-				createMoon();
-			}
-		}
-		
-		private void createMoon() {
-			float distance = (float) (MIN_DISTANCE + (MAX_DISTANCE - MIN_DISTANCE) * Math.random());
-			distance *= shape.getWidth()/2;
-			float angle = (float) (2 * Math.PI * Math.random());
-			float x = (float) (shape.getX() + shape.getWidth()/2 + distance * Math.cos(angle));
-			float y = (float) (shape.getY() + shape.getHeight()/2 + distance * Math.sin(angle));
-			Moon moon = new Moon(x, y, engine, physicsWorld);
-			moons.add(moon);
-			engine.getScene().attachChild(moon.getShape());
-			physicsWorld.registerPhysicsConnector(moon.getPhysicsConnector());
-		}
-		
-		public void updateAll() {
-			int size = moons.size();
-			for(int i = 0; i < size; i++) {
-				moons.get(i).update();
-			}
-			
-			EngineLock engineLock = engine.getEngineLock();
-			engineLock.lock();
-			for(int i = size - 1; i >= 0; i--) {
-				if(moons.get(i).isDead()) {
-					remove(moons.get(i));
-				}
-			}
-			engineLock.unlock();
-		}
-		
-		private void remove(Moon moon) {
-			engine.getScene().detachChild(moon.getShape());
-			moon.getShape().dispose();
-			physicsWorld.unregisterPhysicsConnector(moon.getPhysicsConnector());
-			physicsWorld.destroyBody(moon.getBody());
-			moons.remove(moon);
-		}
-		
-		public void killAll() {
-			EngineLock engineLock = engine.getEngineLock();
-			engineLock.lock();
-			
-			int size = moons.size();
-			Moon moon = null;
-			for(int i = size - 1; i >= 0; i--) {
-				moon = moons.get(i);
-				remove(moon);
-			}
-			
-			engineLock.unlock();
-		}
-		
 	}
 }
