@@ -6,6 +6,9 @@ import org.andengine.extension.physics.box2d.PhysicsWorld;
 
 import com.badlogic.gdx.math.Vector2;
 
+import ddmp.projecttetra.entity.Comet;
+import ddmp.projecttetra.entity.Planet;
+
 /**
  * Spawns planets in the vicinity of the comet.
  */
@@ -42,9 +45,8 @@ public class PlanetSpawner implements IUpdateHandler {
 			
 			/* Check so it is not too close to another planet. */
 			if(!planetManager.isGravitated(spt)) {
-				Planet planet = new Planet(spt.x, spt.y, comet, engine, physicsWorld);
-				engine.getScene().attachChild(planet.getShape());
-				physicsWorld.registerPhysicsConnector(planet.getPhysicsConnector());
+				Planet planet = Planet.createPlanet(engine, physicsWorld, spt.x, spt.y, comet);
+				planet.registerSelf();
 				this.planetManager.addPlanet(planet);
 				timeSinceSpawn = getSpawnTime();
 			}
@@ -63,7 +65,7 @@ public class PlanetSpawner implements IUpdateHandler {
 	}
 	
 	private Vector2 getSpawnPoint(float size) {
-		double angle = Math.atan2(comet.getBody().getLinearVelocity().y, comet.getBody().getLinearVelocity().x);
+		double angle = Math.atan2(comet.getLinearVelocity().y, comet.getLinearVelocity().x);
 		angle += Math.PI/4 - Math.random() * Math.PI/2;
 		double spawnDistance = (engine.getCamera().getWidth() / 2) * (engine.getCamera().getWidth() / 2) +
 								(engine.getCamera().getHeight() / 2) * (engine.getCamera().getHeight() / 2);
