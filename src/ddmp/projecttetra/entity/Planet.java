@@ -114,4 +114,9 @@ public class Planet extends Entity {
 		
 		return distance < GRAVITY_FIELD_DISTANCE * getWidth() / 2;
 	}
+	
+	@Override
+	public float getMass() {
+		return mass;
+	}
 }
