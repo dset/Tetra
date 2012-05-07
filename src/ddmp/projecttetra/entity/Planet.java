@@ -1,4 +1,4 @@
-package ddmp.projecttetra;
+package ddmp.projecttetra.entity;
 
 import java.util.ArrayList;
 
@@ -17,12 +17,16 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
+import ddmp.projecttetra.RegionManager;
+import ddmp.projecttetra.TetraActivity;
+
 /**
  * A planet in the game.
  */
-public class Planet {
+public class Planet extends Entity {
 	
-	private static final FixtureDef PLANET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
+	private static final FixtureDef PLANET_FIXTURE_DEF = 
+			PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 	private static final float PLANET_MIN_SIZE = 0.35f; //In percent of camera height
 	private static final float PLANET_MAX_SIZE = 0.55f;	//In percent of camera height
 	private static final float GRAVITY_CONSTANT = 7f;
@@ -33,36 +37,35 @@ public class Planet {
 	private static final float GRAVITY_ANGLE = (float) (Math.PI/1.5);
 	private static final float BOOST_DISTANCE = 6f;
 	
-	private PhysicsConnector con;
-	private Body body;
-	private Sprite shape;
 	private Comet comet;
 	private MoonManager moonManager;
 	/* Since planets are static their body has mass 0. But mass is needed to calculate
 	 * effect of gravity. Therefore mass is added. */
 	private float mass;
-	private boolean dead;
-	private float planetSize;
-
-	public Planet(float x, float y, Comet comet, Engine engine, PhysicsWorld physicsWorld) {
-		this.comet = comet;
-		this.dead = false;
-		
+	
+	public static Planet createPlanet(Engine engine, PhysicsWorld physicsWorld, float x, float y,
+			Comet comet) {
 		float scale = PLANET_MIN_SIZE + (PLANET_MAX_SIZE - PLANET_MIN_SIZE) * (float) Math.random();
 		float size = scale * TetraActivity.CAMERA_HEIGHT;
-		shape = new Sprite(x, y, size, size, RegionManager.getInstance().get(RegionManager.Region.PLANET), 
-				engine.getVertexBufferObjectManager());
-		body = PhysicsFactory.createCircleBody(physicsWorld, shape, 
+		Sprite sprite = new Sprite(x, y, size, size, RegionManager.getInstance().get(
+				RegionManager.Region.PLANET), engine.getVertexBufferObjectManager());
+		Body body = PhysicsFactory.createCircleBody(physicsWorld, sprite, 
 				BodyType.StaticBody, PLANET_FIXTURE_DEF);
-		this.con = new PhysicsConnector(shape, body, true, true);
+		return new Planet(engine, physicsWorld, sprite, body, comet);
+	}
+	
+	private Planet(Engine engine, PhysicsWorld physicsWorld, Sprite sprite, Body body, 
+			Comet comet) {
+		super(engine, physicsWorld, sprite, body);
 		
-		this.mass = (float) (Math.PI * Math.pow(shape.getWidthScaled()/2 * (1/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT), 2));
-		this.planetSize = con.getShape().getScaleCenterX()*2;
-		
+		this.mass = (float) (Math.PI * Math.pow(sprite.getWidthScaled()/2 *
+				(1/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT), 2));
+		this.comet = comet;
 		this.moonManager = new MoonManager(engine, physicsWorld);
 	}
 	
-	public void update() {
+	@Override
+	public void onUpdate(float pSecondsElapsed) {
 		/* Attract comet by gravity */
 		float cometCenterX = comet.getShape().getX() + comet.getShape().getScaleCenterX();
 		float cometCenterY = comet.getShape().getY() + comet.getShape().getScaleCenterY();
@@ -112,21 +115,10 @@ public class Planet {
 		}
 		
 	}
-	
-	public Body getBody() {
-		return con.getBody();
-	}
-	
-	public IShape getShape() {
-		return con.getShape();
-	}
-	
-	public PhysicsConnector getPhysicsConnector() {
-		return con;
-	}
-	
-	public boolean isDead() {
-		return dead;
+
+	@Override
+	public void reset() {
+		
 	}
 
 	public boolean isGravitating(Vector2 point) {
@@ -212,5 +204,4 @@ public class Planet {
 		}
 		
 	}
-
 }
