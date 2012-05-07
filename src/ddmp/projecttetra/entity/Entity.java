@@ -99,6 +99,20 @@ public abstract class Entity implements IUpdateHandler {
 	}
 	
 	/**
+	 * Returns the width of the entity.
+	 */
+	public float getWidth() {
+		return ((Sprite) bodySpriteConnector.getShape()).getWidth();
+	}
+	
+	/**
+	 * Returns the height of the entity.
+	 */
+	public float getHeight() {
+		return ((Sprite) bodySpriteConnector.getShape()).getHeight();
+	}
+	
+	/**
 	 * Returns a vector holding the linear velocity of the entity.
 	 * The vector should be returned to the vector pool by calling
 	 * Vector2Pool.recycle(v);
