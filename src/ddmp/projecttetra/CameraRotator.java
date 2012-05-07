@@ -5,6 +5,8 @@ import org.andengine.engine.handler.IUpdateHandler;
 
 import com.badlogic.gdx.math.Vector2;
 
+import ddmp.projecttetra.entity.Comet;
+
 /**
  * Handles the camera rotation. The camera rotation follows the
  * rotation of the comet.
@@ -47,7 +49,7 @@ public class CameraRotator implements IUpdateHandler {
 	}
 	
 	private void updateCamera(float slowness) {
-		Vector2 tmpVel = comet.getBody().getLinearVelocity();
+		Vector2 tmpVel = comet.getLinearVelocity();
 		float goalAngle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180
 				/ Math.PI + 90);
 		float camAngle = camera.getRotation();
@@ -69,7 +71,7 @@ public class CameraRotator implements IUpdateHandler {
 			camera.setRotation((float) (slowness * camAngle + goalAngle)
 					/ (slowness + 1));
 		}
-		float zoomFactor = 2.5f/(float)Math.pow(comet.getBody().getLinearVelocity().len(),0.5f);
+		float zoomFactor = 2.5f/(float)Math.pow(comet.getLinearVelocity().len(),0.5f);
 		camera.setZoomFactor((zoomFactor<1.0f)? zoomFactor : 1.0f);
 	}
 }
