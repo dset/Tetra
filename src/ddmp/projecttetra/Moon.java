@@ -65,10 +65,18 @@ public class Moon {
 			if(contact.isTouching()) {
 				Object aData = contact.getFixtureA().getUserData();
 				Object bData = contact.getFixtureB().getUserData();
-				if((aData == this || bData == this) && 
-						(aData instanceof Comet || bData instanceof Comet)) {
+				if((aData == this || bData == this)) {
 					/* This has collided with comet, break apart. */
-					breakApart();
+					if (aData instanceof Comet) {
+						breakApart();
+						((Comet) aData).boost();
+						engine.vibrate(80);
+					} else if (bData instanceof Comet) {
+						breakApart();
+						((Comet) bData).boost();
+						engine.vibrate(80);
+					}
+					
 				}
 			}
 		}

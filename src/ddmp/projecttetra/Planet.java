@@ -23,12 +23,12 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 public class Planet {
 	
 	private static final FixtureDef PLANET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
-	private static final float PLANET_MIN_SIZE = 0.35f; //In percent of camera height
-	private static final float PLANET_MAX_SIZE = 0.55f;	//In percent of camera height
-	private static final float GRAVITY_CONSTANT = 7f;
+	private static final float PLANET_MIN_SIZE = 0.7f; //In percent of camera height
+	private static final float PLANET_MAX_SIZE = 0.9f;	//In percent of camera height
+	private static final float GRAVITY_CONSTANT = 0.6f;
 	private static final float KILL_DISTANCE_SQUARED = 2250000;
 	/* Relative planet radius. */
-	private static final float GRAVITY_FIELD_DISTANCE = 5f;
+	private static final float GRAVITY_FIELD_DISTANCE = 3f;
 	/* Angle to determine when to apply gravity. */
 	private static final float GRAVITY_ANGLE = (float) (Math.PI/1.5);
 	private static final float BOOST_DISTANCE = 6f;
@@ -142,8 +142,8 @@ public class Planet {
 	
 	private class MoonManager {
 		
-		private static final float MIN_DISTANCE = 1.75f; /* In planet radii. */
-		private static final float MAX_DISTANCE = 3.0f; /* In planet radii. */
+		private static final float MIN_DISTANCE = 1.2f; /* In planet radii. */
+		private static final float MAX_DISTANCE = 2.0f; /* In planet radii. */
 		private static final int MIN_NUMBER = 3;
 		private static final int MAX_NUMBER = 5;
 		

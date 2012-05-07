@@ -96,7 +96,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	@Override
 	protected Scene onCreateScene() {
 		this.mEngine.registerUpdateHandler(new FPSLogger());
-
+		this.mEngine.enableVibrator(this);
+		
 		this.scene = new Scene();
 		
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);

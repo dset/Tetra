@@ -27,8 +27,13 @@ public class Comet implements IUpdateHandler {
 	private static final float INITIAL_SPEED_Y = -7f;
 	private static final float ROTATION_VELOCITY = (float) Math.PI / 2;	/* Rad/s */
 	private static final float FRICTION_COEFFICIENT = 5f;
+	private static final float MINIMAL_MINIMAL_VELOCITY = 7.0f;
+	private static final float TIME_BOOSTED = 3.0f;
+	private static final float BOOST_MULTIPLIER = 1.3f;
 	
 	private PhysicsConnector con;
+	private float minimalVelocity;
+	private float timeTilSlow;
 	private Vector2 velocity;
 	private float[] rotationMatrix;
 	private boolean turnLeft;
@@ -53,11 +58,20 @@ public class Comet implements IUpdateHandler {
 		//physicsWorld.registerPhysicsConnector(con); SEE onUpdate
 		cometBody.setLinearVelocity(0, INITIAL_SPEED_Y);
 		this.velocity = con.getBody().getLinearVelocity();
+		this.minimalVelocity = MINIMAL_MINIMAL_VELOCITY;
 	}
 	
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
-		con.onUpdate(pSecondsElapsed); // TODO XXX Ugly hack to get camera "shaking" to stop.
+		con.onUpdate(pSecondsElapsed);
+		timeTilSlow -= pSecondsElapsed;
+		if (timeTilSlow < 0) {
+			minimalVelocity = MINIMAL_MINIMAL_VELOCITY;
+		}
+		float vFactor = minimalVelocity / velocity.len();
+		if (vFactor > 1.0f) {
+			con.getBody().setLinearVelocity(velocity.mul(vFactor));
+		}		
 		
 		if(turnLeft) {
 			setRotationMatrix(ROTATION_VELOCITY*pSecondsElapsed);
@@ -100,6 +114,11 @@ public class Comet implements IUpdateHandler {
 	
 	public void setTurnRight(boolean val) {
 		turnRight = val;
+	}
+	
+	public void boost(){
+		minimalVelocity *= BOOST_MULTIPLIER;
+		timeTilSlow = TIME_BOOSTED;
 	}
 	
 	private void setRotationMatrix(float angle) {
