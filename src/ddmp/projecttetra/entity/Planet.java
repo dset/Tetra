@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import ddmp.projecttetra.RegionManager;
 import ddmp.projecttetra.TetraActivity;
 import ddmp.projecttetra.Utilities;
+import ddmp.projecttetra.entity.util.MoonCreator;
 
 /**
  * A planet in the game.
@@ -120,5 +121,11 @@ public class Planet extends Entity {
 	@Override
 	public float getMass() {
 		return mass;
+	}
+	
+	@Override
+	public void registerSelf() {
+		super.registerSelf();
+		MoonCreator.createMoons(engine, physicsWorld, this);
 	}
 }
