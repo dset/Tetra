@@ -1,5 +1,7 @@
 package ddmp.projecttetra;
 
+import com.badlogic.gdx.math.Vector2;
+
 /**
  * Holds utility methods.
  */
@@ -23,6 +25,19 @@ public class Utilities {
 			throw new IllegalArgumentException("high < low");
 		}
 		return (int) (low + (high + 1 - low) * Math.random());
+	}
+	
+	/**
+	 * Rotates the given vector by angle radians.
+	 */
+	public static void rotateVector(Vector2 vector, float angle) {
+		if(vector == null) {
+			throw new IllegalArgumentException("vector == null");
+		}
+		
+		float x = (float) (vector.x * Math.cos(angle) - vector.y * Math.sin(angle));
+		float y = (float) (vector.x * Math.sin(angle) + vector.y * Math.cos(angle));
+		vector.set(x, y);
 	}
 	
 }
