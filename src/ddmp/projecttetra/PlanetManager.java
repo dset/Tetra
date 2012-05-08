@@ -53,7 +53,7 @@ public class PlanetManager implements IUpdateHandler {
 
 	public boolean isGravitated(Vector2 point) {
 		for(Planet planet : planets) {
-			if (planet.isGravitating(point)) {
+			if (!planet.isDestroyed() && planet.isGravitating(point)) {
 				return true;
 			}
 		}
