@@ -57,7 +57,7 @@ public class PlanetSpawner implements IUpdateHandler {
 	}
 
 	private float getSpawnTime() {
-		return MIN_SPAWN_TIME + (float) Math.random() * (MAX_SPAWN_TIME - MIN_SPAWN_TIME);
+		return Utilities.getRandomFloatBetween(MIN_SPAWN_TIME, MAX_SPAWN_TIME);
 	}
 
 	@Override

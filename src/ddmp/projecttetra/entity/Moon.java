@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 import ddmp.projecttetra.RegionManager;
 import ddmp.projecttetra.TetraActivity;
+import ddmp.projecttetra.Utilities;
 
 /**
  * A moon in the game.
@@ -28,7 +29,7 @@ public class Moon extends Entity {
 	private static final float MOON_MAX_SIZE = 0.12f;	//In percent of camera height
 	
 	public static Moon createMoon(Engine engine, PhysicsWorld physicsWorld, float x, float y) {
-		float scale = MOON_MIN_SIZE + (MOON_MAX_SIZE - MOON_MIN_SIZE) * (float) Math.random();
+		float scale = Utilities.getRandomFloatBetween(MOON_MIN_SIZE, MOON_MAX_SIZE);
 		float size = scale * TetraActivity.CAMERA_HEIGHT;
 		Sprite sprite = new Sprite(x, y, size, size, RegionManager.getInstance().get(
 				RegionManager.Region.MOON), engine.getVertexBufferObjectManager());

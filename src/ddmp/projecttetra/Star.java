@@ -16,7 +16,7 @@ public class Star extends Sprite {
 	public Star(Camera camera, VertexBufferObjectManager vertexBufferObjectManager) {
 		super(0, 0, RegionManager.getInstance().get(RegionManager.Region.STAR), vertexBufferObjectManager);
 		
-		float size = (STAR_MIN_SIZE + (float) Math.random() * (STAR_MAX_SIZE - STAR_MIN_SIZE)) * camera.getHeight();
+		float size = Utilities.getRandomFloatBetween(STAR_MIN_SIZE, STAR_MAX_SIZE) * camera.getHeight();
 		setSize(size, size);
 		setAlpha((float) Math.random());
 		this.camera = camera;

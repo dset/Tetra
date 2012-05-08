@@ -76,17 +76,17 @@ public class StarBackground extends Entity {
 	
 	private void spawnStarInsideView() {
 		float spawnDistance = getSpawnDistance() * (float) Math.random();
-		double angle = 2 * Math.PI * Math.random();
-		spawnStar(spawnDistance, (float) angle);
+		float angle = Utilities.getRandomFloatBetween(0, 2 * (float) Math.PI);
+		spawnStar(spawnDistance, angle);
 	}
 	
 	private void spawnStarOutsideView() {
 		float spawnDistance = getSpawnDistance();
 		Vector2 cometVelocity = comet.getLinearVelocity();
-		double angle = Math.atan2(cometVelocity.y, cometVelocity.x);
+		float angle = (float) Math.atan2(cometVelocity.y, cometVelocity.x);
 		Vector2Pool.recycle(cometVelocity);
-		angle += Math.PI/4 - Math.random() * Math.PI/2;
-		spawnStar(spawnDistance, (float) angle);
+		angle += Utilities.getRandomFloatBetween((float) -Math.PI / 4, (float) Math.PI / 4);
+		spawnStar(spawnDistance, angle);
 	}
 	
 	private void spawnStar(float distance, float angle) {

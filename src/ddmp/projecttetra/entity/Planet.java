@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 import ddmp.projecttetra.RegionManager;
 import ddmp.projecttetra.TetraActivity;
+import ddmp.projecttetra.Utilities;
 
 /**
  * A planet in the game.
@@ -39,7 +40,7 @@ public class Planet extends Entity {
 	
 	public static Planet createPlanet(Engine engine, PhysicsWorld physicsWorld, float x, float y,
 			Comet comet) {
-		float scale = PLANET_MIN_SIZE + (PLANET_MAX_SIZE - PLANET_MIN_SIZE) * (float) Math.random();
+		float scale = Utilities.getRandomFloatBetween(PLANET_MIN_SIZE, PLANET_MAX_SIZE);
 		float size = scale * TetraActivity.CAMERA_HEIGHT;
 		Sprite sprite = new Sprite(x, y, size, size, RegionManager.getInstance().get(
 				RegionManager.Region.PLANET), engine.getVertexBufferObjectManager());
