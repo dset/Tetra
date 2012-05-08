@@ -90,6 +90,7 @@ public class Planet extends Entity {
 //				Vector2 escapeForce = velTmp.cpy().nor().mul(escapeScalar);
 //				comet.getBody().applyForce(escapeForce, comet.getBody().getPosition());
 			}
+			Vector2Pool.recycle(velTmp);
 			Vector2Pool.recycle(centerPosition);
 			Vector2Pool.recycle(cometCenterPosition);
 		}

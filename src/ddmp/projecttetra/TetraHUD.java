@@ -7,9 +7,12 @@ import org.andengine.entity.Entity;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.util.FPSCounter;
+import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+
+import com.badlogic.gdx.math.Vector2;
 
 import ddmp.projecttetra.entity.Comet;
 
@@ -69,8 +72,10 @@ public class TetraHUD extends HUD {
 		super.onManagedUpdate(pSecondsElapsed);
 
 		scoreText.setText("Score: " + (int) (-comet.getCenterY()));
-		setSidePosition(holeArrowSprite, (float) Math.atan2(comet.getLinearVelocity().x,
-				comet.getLinearVelocity().y));
+		Vector2 cometVelocity = comet.getLinearVelocity();
+		setSidePosition(holeArrowSprite, (float) Math.atan2(cometVelocity.x,
+				cometVelocity.y));
+		Vector2Pool.recycle(cometVelocity);
 
 		/*ArrayList<Planet> planets = pManager.getPlanets();
 		Planet topPlanets[] = new Planet[3];

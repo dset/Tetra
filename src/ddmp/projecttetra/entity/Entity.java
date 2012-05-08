@@ -153,7 +153,10 @@ public abstract class Entity implements IUpdateHandler {
 	public float getDistancePixels(Entity other) {
 		Vector2 thisPos = getCenter();
 		Vector2 otherPos = other.getCenter();
-		return thisPos.dst(otherPos);
+		float distance = thisPos.dst(otherPos);
+		Vector2Pool.recycle(thisPos);
+		Vector2Pool.recycle(otherPos);
+		return distance;
 	}
 	
 	/**

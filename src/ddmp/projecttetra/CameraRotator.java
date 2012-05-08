@@ -2,6 +2,7 @@ package ddmp.projecttetra;
 
 import org.andengine.engine.camera.ZoomCamera;
 import org.andengine.engine.handler.IUpdateHandler;
+import org.andengine.extension.physics.box2d.util.Vector2Pool;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -49,9 +50,11 @@ public class CameraRotator implements IUpdateHandler {
 	}
 	
 	private void updateCamera(float slowness) {
-		Vector2 tmpVel = comet.getLinearVelocity();
-		float goalAngle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180
+		Vector2 cometVelocity = comet.getLinearVelocity();
+		float cometSpeed = cometVelocity.len();
+		float goalAngle = (float) -(Math.atan2(cometVelocity.y, cometVelocity.x) * 180
 				/ Math.PI + 90);
+		Vector2Pool.recycle(cometVelocity);
 		float camAngle = camera.getRotation();
 		if (camAngle <= -180 && goalAngle >= 0) {
 			float newAngle = (slowness * camAngle + (goalAngle - 360))
@@ -71,7 +74,7 @@ public class CameraRotator implements IUpdateHandler {
 			camera.setRotation((float) (slowness * camAngle + goalAngle)
 					/ (slowness + 1));
 		}
-		float zoomFactor = 2.5f/(float)Math.pow(comet.getLinearVelocity().len(),0.5f);
+		float zoomFactor = 2.5f/(float)Math.pow(cometSpeed, 0.5f);
 		camera.setZoomFactor((zoomFactor<1.0f)? zoomFactor : 1.0f);
 	}
 }

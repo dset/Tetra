@@ -3,6 +3,7 @@ package ddmp.projecttetra;
 import org.andengine.engine.Engine;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
+import org.andengine.extension.physics.box2d.util.Vector2Pool;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -65,7 +66,9 @@ public class PlanetSpawner implements IUpdateHandler {
 	}
 	
 	private Vector2 getSpawnPoint(float size) {
-		double angle = Math.atan2(comet.getLinearVelocity().y, comet.getLinearVelocity().x);
+		Vector2 cometVelocity = comet.getLinearVelocity();
+		double angle = Math.atan2(cometVelocity.y, cometVelocity.x);
+		Vector2Pool.recycle(cometVelocity);
 		angle += Math.PI/4 - Math.random() * Math.PI/2;
 		double spawnDistance = (engine.getCamera().getWidth() / 2) * (engine.getCamera().getWidth() / 2) +
 								(engine.getCamera().getHeight() / 2) * (engine.getCamera().getHeight() / 2);

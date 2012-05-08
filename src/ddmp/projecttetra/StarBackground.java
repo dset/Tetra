@@ -6,7 +6,10 @@ import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.entity.Entity;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
+
+import com.badlogic.gdx.math.Vector2;
 
 import ddmp.projecttetra.entity.Comet;
 
@@ -64,8 +67,10 @@ public class StarBackground extends Entity {
 	}
 	
 	private void updatePosition(float pSecondsElapsed) {
-		float vX = comet.getLinearVelocity().x * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT * RELATIVE_SPEED;
-		float vY = comet.getLinearVelocity().y * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT * RELATIVE_SPEED;
+		Vector2 cometVelocity = comet.getLinearVelocity();
+		float vX = cometVelocity.x * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT * RELATIVE_SPEED;
+		float vY = cometVelocity.y * PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT * RELATIVE_SPEED;
+		Vector2Pool.recycle(cometVelocity);
 		this.setPosition(this.getX() + vX * pSecondsElapsed, this.getY() + vY * pSecondsElapsed);
 	}
 	
@@ -77,7 +82,9 @@ public class StarBackground extends Entity {
 	
 	private void spawnStarOutsideView() {
 		float spawnDistance = getSpawnDistance();
-		double angle = Math.atan2(comet.getLinearVelocity().y, comet.getLinearVelocity().x);
+		Vector2 cometVelocity = comet.getLinearVelocity();
+		double angle = Math.atan2(cometVelocity.y, cometVelocity.x);
+		Vector2Pool.recycle(cometVelocity);
 		angle += Math.PI/4 - Math.random() * Math.PI/2;
 		spawnStar(spawnDistance, (float) angle);
 	}
