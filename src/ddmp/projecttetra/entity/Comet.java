@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 
 import ddmp.projecttetra.RegionManager;
 import ddmp.projecttetra.TetraActivity;
+import ddmp.projecttetra.Utilities;
 
 /**
  * The comet that the player controls in the game.
@@ -27,7 +28,6 @@ public class Comet extends Entity {
 	private static final float ROTATION_VELOCITY = (float) Math.PI / 2;	/* Rad/s */
 	private static final float FRICTION_COEFFICIENT = 5f;
 	
-	private float[] rotationMatrix;
 	private boolean turnLeft;
 	private boolean turnRight;
 	private Camera camera;
@@ -48,7 +48,6 @@ public class Comet extends Entity {
 		super(engine, physicsWorld, sprite, body);
 		
 		this.camera = camera;
-		rotationMatrix = new float[4];
 		turnLeft = false;
 		turnRight = false;
 		bodySpriteConnector.getBody().setLinearVelocity(0, INITIAL_SPEED_Y);
@@ -59,20 +58,7 @@ public class Comet extends Entity {
 	public void onUpdate(float pSecondsElapsed) {
 		Sprite sprite = (Sprite) bodySpriteConnector.getShape();
 		Body body = bodySpriteConnector.getBody();
-		Vector2 velocity;
-		if(turnLeft) {
-			setRotationMatrix(ROTATION_VELOCITY * pSecondsElapsed);
-			velocity = body.getLinearVelocity();
-			body.setLinearVelocity(rotationMatrix[0] * velocity.x + rotationMatrix[2] * velocity.y,
-						rotationMatrix[1] * velocity.x + rotationMatrix[3] * velocity.y);
-		}
-		
-		if(turnRight) {
-			setRotationMatrix(-ROTATION_VELOCITY*pSecondsElapsed);
-			velocity = body.getLinearVelocity();
-			body.setLinearVelocity(rotationMatrix[0] * velocity.x + rotationMatrix[2] * velocity.y,
-					rotationMatrix[1] * velocity.x + rotationMatrix[3] * velocity.y);
-		}
+		updateDirection(pSecondsElapsed);
 		
 		Vector2 tmpVel = Vector2Pool.obtain().set(body.getLinearVelocity());
 		float angle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180/Math.PI + 90);
@@ -87,19 +73,29 @@ public class Comet extends Entity {
 		
 	}
 	
+	private void updateDirection(float pSecondsElapsed) {
+		float directionDelta = 0;
+		if(turnLeft && !turnRight) {
+			directionDelta = -ROTATION_VELOCITY * pSecondsElapsed;
+		}else if(turnRight && !turnLeft) {
+			directionDelta = ROTATION_VELOCITY * pSecondsElapsed;
+		}
+		changeDirection(directionDelta);
+	}
+	
+	private void changeDirection(float directionDelta) {
+		Vector2 direction = getLinearVelocity();
+		Utilities.rotateVector(direction, directionDelta);
+		bodySpriteConnector.getBody().setLinearVelocity(direction);
+		Vector2Pool.recycle(direction);
+	}
+	
 	public void setTurnLeft(boolean val) {
 		turnLeft = val;
 	}
 	
 	public void setTurnRight(boolean val) {
 		turnRight = val;
-	}
-	
-	private void setRotationMatrix(float angle) {
-		rotationMatrix[0] = (float) Math.cos(angle);
-		rotationMatrix[1] = (float) -Math.sin(angle);
-		rotationMatrix[2] = (float) Math.sin(angle);
-		rotationMatrix[3] = (float) Math.cos(angle);
 	}
 
 	@Override

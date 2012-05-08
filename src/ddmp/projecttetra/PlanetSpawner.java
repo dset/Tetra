@@ -66,18 +66,17 @@ public class PlanetSpawner implements IUpdateHandler {
 	}
 	
 	private Vector2 getSpawnPoint(float size) {
-		Vector2 cometVelocity = comet.getLinearVelocity();
-		double angle = Math.atan2(cometVelocity.y, cometVelocity.x);
-		Vector2Pool.recycle(cometVelocity);
-		angle += Math.PI/4 - Math.random() * Math.PI/2;
-		double spawnDistance = (engine.getCamera().getWidth() / 2) * (engine.getCamera().getWidth() / 2) +
+		Vector2 direction = comet.getLinearVelocity().nor();
+		float randomAngle = Utilities.getRandomFloatBetween((float) -Math.PI/4, (float) Math.PI/4);
+		Utilities.rotateVector(direction, randomAngle);
+		float spawnDistance = (engine.getCamera().getWidth() / 2) * (engine.getCamera().getWidth() / 2) +
 								(engine.getCamera().getHeight() / 2) * (engine.getCamera().getHeight() / 2);
-		spawnDistance = Math.sqrt(spawnDistance) + (float) 1/Math.sqrt(2) * size;
-		spawnDistance = spawnDistance + Math.random() * 2 * spawnDistance;
-		
-		float tmpX = (float) (engine.getCamera().getCenterX() + Math.cos(angle) * spawnDistance) - size/2;
-		float tmpY = (float) (engine.getCamera().getCenterY() + Math.sin(angle) * spawnDistance) - size/2;
-		spawnPoint.set(tmpX, tmpY);
+		spawnDistance = (float) Math.sqrt(spawnDistance);
+		spawnDistance = Utilities.getRandomFloatBetween(spawnDistance, 3 * spawnDistance);
+		Vector2 centerOffset = direction.mul(spawnDistance);
+		spawnPoint.set(comet.getCenterX(), comet.getCenterY());
+		spawnPoint.add(centerOffset);
+		Vector2Pool.recycle(direction);
 		return spawnPoint;
 	}
 
