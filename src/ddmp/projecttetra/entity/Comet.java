@@ -52,6 +52,7 @@ public class Comet extends Entity {
 		turnLeft = false;
 		turnRight = false;
 		bodySpriteConnector.getBody().setLinearVelocity(0, INITIAL_SPEED_Y);
+		bodySpriteConnector.setUpdateRotation(false);
 	}
 	
 	@Override
