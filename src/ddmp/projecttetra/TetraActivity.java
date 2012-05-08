@@ -6,7 +6,6 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
-import org.andengine.entity.util.FPSLogger;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.ITexture;
@@ -18,7 +17,7 @@ import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSourc
 import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
 import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.ui.activity.SimpleBaseGameActivity;
+import org.andengine.ui.activity.BaseGameActivity;
 import org.andengine.util.debug.Debug;
 
 import android.graphics.Color;
@@ -28,7 +27,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import ddmp.projecttetra.entity.Comet;
 
-public class TetraActivity extends SimpleBaseGameActivity {
+public class TetraActivity extends BaseGameActivity {
 
 	public static final int CAMERA_WIDTH = 480;
 	public static final int CAMERA_HEIGHT = 720;
@@ -50,7 +49,7 @@ public class TetraActivity extends SimpleBaseGameActivity {
 	}
 
 	@Override
-	protected void onCreateResources() {
+	public final void onCreateResources(OnCreateResourcesCallback callback) throws Exception {
 		mTextureAtlas = new BuildableBitmapTextureAtlas(
 				this.getTextureManager(), 1024, 1024,
 				TextureOptions.BILINEAR);
@@ -93,14 +92,19 @@ public class TetraActivity extends SimpleBaseGameActivity {
 				Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 20, true,
 				Color.WHITE);
 		this.mFont.load();
+		
+		callback.onCreateResourcesFinished();
 	}
 
 	@Override
-	protected Scene onCreateScene() {
-		this.mEngine.registerUpdateHandler(new FPSLogger());
-
+	public final void onCreateScene(OnCreateSceneCallback callback) throws Exception {
 		this.scene = new Scene();
-		
+		callback.onCreateSceneFinished(this.scene);
+	}
+	
+	@Override
+	public final void onPopulateScene(Scene scene, OnPopulateSceneCallback callback)
+			throws Exception {
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
 		scene.registerUpdateHandler(mPhysicsWorld);
 		
@@ -112,8 +116,8 @@ public class TetraActivity extends SimpleBaseGameActivity {
 		scene.registerUpdateHandler(cameraRotator);
 		
 		createHUD(cameraRotator);
-
-		return scene;
+		
+		callback.onPopulateSceneFinished();
 	}
 	
 	private void createComet() {
