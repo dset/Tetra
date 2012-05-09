@@ -24,12 +24,12 @@ public class Planet extends Entity {
 	
 	private static final FixtureDef PLANET_FIXTURE_DEF = 
 			PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
-	private static final float PLANET_MIN_SIZE = 0.35f; //In percent of camera height
-	private static final float PLANET_MAX_SIZE = 0.55f;	//In percent of camera height
-	private static final float GRAVITY_CONSTANT = 7f;
+	private static final float PLANET_MIN_SIZE = 0.7f; //In percent of camera height
+	private static final float PLANET_MAX_SIZE = 0.9f;	//In percent of camera height
+	private static final float GRAVITY_CONSTANT = 0.6f;
 	private static final float KILL_DISTANCE = 1500;
 	/* Relative planet radius. */
-	private static final float GRAVITY_FIELD_DISTANCE = 5f;
+	private static final float GRAVITY_FIELD_DISTANCE = 3f;
 	/* Angle to determine when to apply gravity. */
 	private static final float GRAVITY_ANGLE = (float) (Math.PI/1.5);
 	private static final float BOOST_DISTANCE = 6f;

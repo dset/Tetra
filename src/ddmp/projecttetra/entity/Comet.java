@@ -25,6 +25,7 @@ public class Comet extends Entity {
 	private static final float COMET_SIZE = 0.10f; /* In percent of camera height. */
 	private static final FixtureDef COMET_FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f);
 	private static final float INITIAL_SPEED_Y = -7f;
+	private static final float MINIMAL_SPEED = 7.0f;
 	private static final float ROTATION_VELOCITY = (float) Math.PI / 2;	/* Rad/s */
 	private static final float FRICTION_COEFFICIENT = 5f;
 	
@@ -59,6 +60,7 @@ public class Comet extends Entity {
 		updateDirection(pSecondsElapsed);
 		updateRotation();
 		applyFriction(pSecondsElapsed);
+		updateSpeed();
 		updateCamera();
 	}
 	
@@ -92,6 +94,15 @@ public class Comet extends Entity {
 		float frictionScalar = -FRICTION_COEFFICIENT * pSecondsElapsed * speedSquared;
 		Vector2 frictionForce = velocity.nor().mul(frictionScalar);
 		applyForce(frictionForce.x, frictionForce.y);
+		Vector2Pool.recycle(velocity);
+	}
+	
+	private void updateSpeed() {
+		Vector2 velocity = getLinearVelocity();
+		if(velocity.len() < MINIMAL_SPEED) {
+			velocity.nor().mul(MINIMAL_SPEED);
+			setLinearVelocity(velocity.x, velocity.y);
+		}
 		Vector2Pool.recycle(velocity);
 	}
 	

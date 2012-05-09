@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import ddmp.projecttetra.RegionManager;
 import ddmp.projecttetra.TetraActivity;
 import ddmp.projecttetra.Utilities;
+import ddmp.projecttetra.entity.util.EntityVelocityModifier;
 import ddmp.projecttetra.entity.util.MoonPieceCreator;
 
 /**
@@ -68,12 +69,23 @@ public class Moon extends Entity {
 				Object bData = contact.getFixtureB().getBody().getUserData();
 				if((aData == this || bData == this) && 
 						(aData instanceof Comet || bData instanceof Comet)) {
-					/* This has collided with comet, break apart. */
-					MoonPieceCreator.createMoonPieces(engine, physicsWorld, this);
-					destroySelf();
+					Comet comet;
+					if(aData instanceof Comet) {
+						comet = (Comet) aData;
+					} else {
+						comet = (Comet) bData;
+					}
+					onCommetCollision(comet);
 				}
 			}
 		}
+	}
+	
+	private void onCommetCollision(Entity comet) {
+		new EntityVelocityModifier(engine, comet, 0.5f, 2f);
+		engine.vibrate(80);
+		MoonPieceCreator.createMoonPieces(engine, physicsWorld, this);
+		destroySelf();
 	}
 
 	@Override

@@ -98,6 +98,7 @@ public class TetraActivity extends BaseGameActivity {
 
 	@Override
 	public final void onCreateScene(OnCreateSceneCallback callback) throws Exception {
+		this.mEngine.enableVibrator(this);
 		this.scene = new Scene();
 		callback.onCreateSceneFinished(this.scene);
 	}
