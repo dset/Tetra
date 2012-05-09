@@ -86,7 +86,7 @@ public class Planet extends Entity {
 	@Override
 	public void registerSelf() {
 		super.registerSelf();
-		MoonCreator.createMoons(engine, physicsWorld, this);
+		MoonCreator.createMoons(engine, physicsWorld, this, comet);
 		engine.getScene().registerUpdateHandler(gravityHandler);
 	}
 	

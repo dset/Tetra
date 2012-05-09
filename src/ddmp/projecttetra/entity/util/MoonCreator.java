@@ -23,16 +23,19 @@ public class MoonCreator {
 	/**
 	 * Creates moons around the given planet.
 	 */
-	public static void createMoons(Engine engine, PhysicsWorld physicsWorld, Entity planet) {
+	public static void createMoons(Engine engine, PhysicsWorld physicsWorld, Entity planet,
+			Entity comet) {
 		int numPlanets = Utilities.getRandomIntBetween(MIN_NUMBER, MAX_NUMBER);
 		for(int i = 0; i < numPlanets; i++) {
-			createMoon(engine, physicsWorld, planet);
+			createMoon(engine, physicsWorld, planet, comet);
 		}
 	}
 	
-	private static void createMoon(Engine engine, PhysicsWorld physicsWorld, Entity planet) {
+	private static void createMoon(Engine engine, PhysicsWorld physicsWorld, Entity planet,
+			Entity comet) {
 		Vector2 spawnPoint = getRandomSpawnPoint(planet);
-		Moon.createMoon(engine, physicsWorld, spawnPoint.x, spawnPoint.y, planet).registerSelf();
+		Moon.createMoon(engine, physicsWorld, spawnPoint.x, spawnPoint.y, planet, comet)
+			.registerSelf();
 		Vector2Pool.recycle(spawnPoint);
 	}
 	
