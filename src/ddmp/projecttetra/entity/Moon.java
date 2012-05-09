@@ -63,8 +63,11 @@ public class Moon extends Entity {
 		for(int i = 0; i < size; i++) {
 			contact = contacts.get(i);
 			if(contact.isTouching()) {
-				Object aData = contact.getFixtureA().getUserData();
-				Object bData = contact.getFixtureB().getUserData();
+				if(contact.getFixtureA() == null || contact.getFixtureB() == null) {
+					continue;
+				}
+				Object aData = contact.getFixtureA().getBody().getUserData();
+				Object bData = contact.getFixtureB().getBody().getUserData();
 				if((aData == this || bData == this) && 
 						(aData instanceof Comet || bData instanceof Comet)) {
 					/* This has collided with comet, break apart. */
