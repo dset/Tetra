@@ -28,22 +28,31 @@ public class Moon extends Entity {
 	private static final float MOON_MIN_SIZE = 0.08f; //In percent of camera height
 	private static final float MOON_MAX_SIZE = 0.12f;	//In percent of camera height
 	
-	public static Moon createMoon(Engine engine, PhysicsWorld physicsWorld, float x, float y) {
+	private Entity planet;
+	
+	public static Moon createMoon(Engine engine, PhysicsWorld physicsWorld, float x, float y,
+			Entity planet) {
 		float scale = Utilities.getRandomFloatBetween(MOON_MIN_SIZE, MOON_MAX_SIZE);
 		float size = scale * TetraActivity.CAMERA_HEIGHT;
 		Sprite sprite = new Sprite(x, y, size, size, RegionManager.getInstance().get(
 				RegionManager.Region.MOON), engine.getVertexBufferObjectManager());
 		Body body = PhysicsFactory.createCircleBody(physicsWorld, sprite, BodyType.StaticBody,
 				MOON_FIXTURE_DEF);
-		return new Moon(engine, physicsWorld, sprite, body);
+		return new Moon(engine, physicsWorld, sprite, body, planet);
 	}
 	
-	private Moon(Engine engine, PhysicsWorld physicsWorld, Sprite sprite, Body body) {
+	private Moon(Engine engine, PhysicsWorld physicsWorld, Sprite sprite, Body body,
+			Entity planet) {
 		super(engine, physicsWorld, sprite, body);
+		this.planet = planet;
 	}
 	
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
+		if(planet.isDestroyed()) {
+			destroySelf();
+			return;
+		}
 		checkForCollisionWithCommet();
 	}
 	

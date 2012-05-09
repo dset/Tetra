@@ -32,7 +32,7 @@ public class MoonCreator {
 	
 	private static void createMoon(Engine engine, PhysicsWorld physicsWorld, Entity planet) {
 		Vector2 spawnPoint = getRandomSpawnPoint(planet);
-		Moon.createMoon(engine, physicsWorld, spawnPoint.x, spawnPoint.y).registerSelf();
+		Moon.createMoon(engine, physicsWorld, spawnPoint.x, spawnPoint.y, planet).registerSelf();
 		Vector2Pool.recycle(spawnPoint);
 	}
 	
