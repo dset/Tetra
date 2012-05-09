@@ -122,6 +122,13 @@ public abstract class Entity implements IUpdateHandler {
 	}
 	
 	/**
+	 * Sets the velocity of this entity.
+	 */
+	public void setLinearVelocity(float speedX, float speedY) {
+		bodySpriteConnector.getBody().setLinearVelocity(speedX, speedY);
+	}
+	
+	/**
 	 * Returns the mass of the entity.
 	 */
 	public float getMass() {
