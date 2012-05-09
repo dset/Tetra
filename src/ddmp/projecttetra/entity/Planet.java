@@ -4,7 +4,6 @@ import org.andengine.engine.Engine;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
-import org.andengine.extension.physics.box2d.util.Vector2Pool;
 import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 
 import com.badlogic.gdx.math.Vector2;
@@ -15,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import ddmp.projecttetra.RegionManager;
 import ddmp.projecttetra.TetraActivity;
 import ddmp.projecttetra.Utilities;
+import ddmp.projecttetra.entity.util.BoostGravityHandler;
 import ddmp.projecttetra.entity.util.MoonCreator;
 
 /**
@@ -34,6 +34,7 @@ public class Planet extends Entity {
 	private static final float GRAVITY_ANGLE = (float) (Math.PI/1.5);
 	private static final float BOOST_DISTANCE = 6f;
 	
+	private BoostGravityHandler gravityHandler;
 	private Comet comet;
 	/* Since planets are static their body has mass 0. But mass is needed to calculate
 	 * effect of gravity. Therefore mass is added. */
@@ -57,52 +58,15 @@ public class Planet extends Entity {
 		this.mass = (float) (Math.PI * Math.pow(sprite.getWidthScaled()/2 *
 				(1/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT), 2));
 		this.comet = comet;
+		this.gravityHandler = new BoostGravityHandler(this, comet, GRAVITY_CONSTANT, 
+				GRAVITY_FIELD_DISTANCE, BOOST_DISTANCE, GRAVITY_ANGLE);
 	}
 	
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
-		/* Attract comet by gravity */
-		Vector2 cometCenterPos = comet.getCenter();
-		if(isGravitating(cometCenterPos)) {
-			 /* Apply gravity if comet is moving towards or almost towards planet. */
-			Vector2 velTmp = comet.getLinearVelocity();
-			Vector2 centerPosition = getCenter();
-			Vector2 cometCenterPosition = comet.getCenter();
-			Vector2 direction = centerPosition.sub(cometCenterPosition);
-			double angle = Math.acos(direction.dot(velTmp) / (direction.len() * velTmp.len()));
-			if(Math.abs(angle) < GRAVITY_ANGLE) {
-				float distance = getDistanceMeters(comet);
-				direction = direction.nor();
-				float gravityScalar = (float) (GRAVITY_CONSTANT * mass * comet.getMass()
-						/ distance);
-				Vector2 gravityForce = direction.mul(gravityScalar);
-				comet.applyForce(gravityForce.x, gravityForce.y);
-				
-				/* Give comet boost if close to planet. */
-				if (distance < BOOST_DISTANCE) {
-					float boostScalar = GRAVITY_CONSTANT * mass * comet.getMass() / distance;
-					Vector2 boostForce = Vector2Pool.obtain().set(velTmp).nor().mul(boostScalar);
-					comet.applyForce(boostForce.x, boostForce.y);
-					Vector2Pool.recycle(boostForce);
-				}
-			} else {
-				/* Give comet some extra speed away from planet. */
-//				float escapeScalar = GRAVITY_CONSTANT * this.mass * comet.getBody().getMass()
-//						/ comet.getBody().getPosition().cpy().sub(this.getBody().getPosition()).len();
-//				Vector2 escapeForce = velTmp.cpy().nor().mul(escapeScalar);
-//				comet.getBody().applyForce(escapeForce, comet.getBody().getPosition());
-			}
-			Vector2Pool.recycle(velTmp);
-			Vector2Pool.recycle(centerPosition);
-			Vector2Pool.recycle(cometCenterPosition);
-		}
-		Vector2Pool.recycle(cometCenterPos);
-		
-		/* Die if far away from comet */
 		if(getDistancePixels(comet) > KILL_DISTANCE) {
 			destroySelf();
 		}
-		
 	}
 
 	@Override
@@ -111,11 +75,7 @@ public class Planet extends Entity {
 	}
 
 	public boolean isGravitating(Vector2 point) {
-		Vector2 centerPosition = getCenter();
-		float distance = centerPosition.dst(point);
-		Vector2Pool.recycle(centerPosition);
-		
-		return distance < GRAVITY_FIELD_DISTANCE * getWidth() / 2;
+		return gravityHandler.isGravitating(point);
 	}
 	
 	@Override
@@ -127,5 +87,18 @@ public class Planet extends Entity {
 	public void registerSelf() {
 		super.registerSelf();
 		MoonCreator.createMoons(engine, physicsWorld, this);
+		engine.getScene().registerUpdateHandler(gravityHandler);
+	}
+	
+	@Override
+	public void unregisterSelf() {
+		super.unregisterSelf();
+		engine.getScene().unregisterUpdateHandler(gravityHandler);
+	}
+	
+	@Override
+	public void destroySelf() {
+		super.destroySelf();
+		engine.getScene().unregisterUpdateHandler(gravityHandler);
 	}
 }
