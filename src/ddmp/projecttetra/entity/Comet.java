@@ -82,6 +82,7 @@ public class Comet extends Entity {
 	private void updateRotation() {
 		Vector2 velocity = getLinearVelocity();
 		float angle = (float) (Math.atan2(velocity.y, velocity.x) * 180/Math.PI + 90);
+		Vector2Pool.recycle(velocity);
 		bodySpriteConnector.getShape().setRotation(angle);
 	}
 	
