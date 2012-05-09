@@ -6,9 +6,6 @@ import org.andengine.engine.Engine;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
-import org.andengine.opengl.texture.ITexture;
-import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.opengl.texture.region.TextureRegionFactory;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -18,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import ddmp.projecttetra.RegionManager;
 import ddmp.projecttetra.TetraActivity;
 import ddmp.projecttetra.Utilities;
+import ddmp.projecttetra.entity.util.MoonPieceCreator;
 
 /**
  * A moon in the game.
@@ -71,33 +69,11 @@ public class Moon extends Entity {
 				if((aData == this || bData == this) && 
 						(aData instanceof Comet || bData instanceof Comet)) {
 					/* This has collided with comet, break apart. */
-					breakApart();
+					MoonPieceCreator.createMoonPieces(engine, physicsWorld, this);
 					destroySelf();
 				}
 			}
 		}
-	}
-	
-	private void breakApart() {
-		ITextureRegion moonTextureRegion = RegionManager.getInstance().get(RegionManager.Region.MOON);
-		ITexture texture = moonTextureRegion.getTexture();
-		int tX = (int) moonTextureRegion.getTextureX();
-		int tY = (int) moonTextureRegion.getTextureY();
-		int tW = (int) moonTextureRegion.getWidth();
-		int tH = (int) moonTextureRegion.getHeight();
-		ITextureRegion reg1 = TextureRegionFactory.extractFromTexture(texture, tX, tY, tW/2, tH/2);
-		ITextureRegion reg2 = TextureRegionFactory.extractFromTexture(texture, tX+tW/2, tY, tW/2, tH/2);
-		ITextureRegion reg3 = TextureRegionFactory.extractFromTexture(texture, tX, tY+tH/2, tW/2, tH/2);
-		ITextureRegion reg4 = TextureRegionFactory.extractFromTexture(texture, tX+tW/2, tY+tH/2, tW/2, tH/2);
-		
-		Sprite sprite = (Sprite) bodySpriteConnector.getShape();
-		float sX = sprite.getX();
-		float sY = sprite.getY();
-		float size = sprite.getWidth() / 2;
-		MoonPiece.createMoonPiece(engine, physicsWorld, sX, sY, size, reg1).registerSelf();
-		MoonPiece.createMoonPiece(engine, physicsWorld, sX+size, sY, size, reg2).registerSelf();
-		MoonPiece.createMoonPiece(engine, physicsWorld, sX, sY+size, size, reg3).registerSelf();
-		MoonPiece.createMoonPiece(engine, physicsWorld, sX+size, sY+size, size, reg4).registerSelf();
 	}
 
 	@Override
