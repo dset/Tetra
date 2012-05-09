@@ -56,21 +56,10 @@ public class Comet extends Entity {
 	
 	@Override
 	public void onUpdate(float pSecondsElapsed) {
-		Sprite sprite = (Sprite) bodySpriteConnector.getShape();
-		Body body = bodySpriteConnector.getBody();
 		updateDirection(pSecondsElapsed);
-		
-		Vector2 tmpVel = Vector2Pool.obtain().set(body.getLinearVelocity());
-		float angle = (float) -(Math.atan2(tmpVel.y, tmpVel.x) * 180/Math.PI + 90);
-		sprite.setRotation(-angle);
-		
-		float lenSq = tmpVel.len2();
-		body.applyForce(tmpVel.nor().mul(
-				-FRICTION_COEFFICIENT * pSecondsElapsed * lenSq), body.getPosition());
-		Vector2Pool.recycle(tmpVel);
-		camera.setCenter(sprite.getX() + sprite.getScaleCenterX(), 
-				sprite.getY() + sprite.getScaleCenterY());
-		
+		updateRotation();
+		applyFriction(pSecondsElapsed);
+		updateCamera();
 	}
 	
 	private void updateDirection(float pSecondsElapsed) {
@@ -86,8 +75,27 @@ public class Comet extends Entity {
 	private void changeDirection(float directionDelta) {
 		Vector2 direction = getLinearVelocity();
 		Utilities.rotateVector(direction, directionDelta);
-		bodySpriteConnector.getBody().setLinearVelocity(direction);
+		setLinearVelocity(direction.x, direction.y);
 		Vector2Pool.recycle(direction);
+	}
+	
+	private void updateRotation() {
+		Vector2 velocity = getLinearVelocity();
+		float angle = (float) (Math.atan2(velocity.y, velocity.x) * 180/Math.PI + 90);
+		bodySpriteConnector.getShape().setRotation(angle);
+	}
+	
+	private void applyFriction(float pSecondsElapsed) {
+		Vector2 velocity = getLinearVelocity();
+		float speedSquared = velocity.len2();
+		float frictionScalar = -FRICTION_COEFFICIENT * pSecondsElapsed * speedSquared;
+		Vector2 frictionForce = velocity.nor().mul(frictionScalar);
+		applyForce(frictionForce.x, frictionForce.y);
+		Vector2Pool.recycle(velocity);
+	}
+	
+	private void updateCamera() {
+		camera.setCenter(getCenterX(), getCenterY());
 	}
 	
 	public void setTurnLeft(boolean val) {
