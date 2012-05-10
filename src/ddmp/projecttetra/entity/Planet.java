@@ -29,7 +29,7 @@ public class Planet extends Entity {
 	private static final float GRAVITY_CONSTANT = 0.6f;
 	private static final float KILL_DISTANCE = 1500;
 	/* Relative planet radius. */
-	private static final float GRAVITY_FIELD_DISTANCE = 3f;
+	private static final float GRAVITY_FIELD_DISTANCE = 6f;
 	/* Angle to determine when to apply gravity. */
 	private static final float GRAVITY_ANGLE = (float) (Math.PI/1.5);
 	private static final float BOOST_DISTANCE = 6f;
